@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Viver</string>
+    <string name="voltar_para_tela_anterior">Voltar para tela anterior</string>
+    <string name="logo">Logo</string>
+    <string name="star_trajectory">Star Trajectory</string>
+    <string name="icone_para_ir_para_perfil">Icone para ir para perfil</string>
 </resources>
