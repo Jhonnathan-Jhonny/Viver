@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-    kotlin("plugin.serialization") version "2.0.20"
+    kotlin("plugin.serialization") version "1.9.0"
 }
 
 android {
@@ -70,11 +70,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    //Supabase
-    implementation(platform("io.github.jan-tennert.supabase:bom:3.0.3"))
+    // Supabase
+    implementation(platform("io.github.jan-tennert.supabase:bom:2.0.0-rc-1"))
     implementation("io.github.jan-tennert.supabase:postgrest-kt")
-    implementation("io.github.jan-tennert.supabase:auth-kt")
-    implementation("io.github.jan-tennert.supabase:realtime-kt")
-    implementation("io.ktor:ktor-client-android:3.0.3")
+    implementation("io.ktor:ktor-client-android:2.3.7")
 
 }

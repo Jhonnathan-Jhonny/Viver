@@ -2,6 +2,7 @@ package com.project.viver.models
 
 import kotlinx.serialization.Serializable
 
+@Suppress("PLUGIN_IS_NOT_ENABLED")
 @Serializable
 class User (
     val id: Int,
