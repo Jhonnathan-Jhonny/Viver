@@ -13,6 +13,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,11 +35,22 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun StartOrderScreen(navController: NavHostController) {
-    LaunchedEffect(key1 = true) {
-        delay(3000) // Aguarda 3 segundos
-        navController.navigate(ViverScreen.Login.name) // Navega para a tela de login
-    }
+//    LaunchedEffect(key1 = true) {
+//        delay(4000) // Aguarda 3 segundos
+//        navController.navigate(ViverScreen.Login.name)
+//    }
+    var hasNavigated by remember { mutableStateOf(false) }
 
+    // Navega para a tela de Login após o delay, apenas uma vez
+    LaunchedEffect(key1 = hasNavigated) {
+        if (!hasNavigated) {
+            delay(4000) // Aguarda 4 segundos
+            navController.navigate(ViverScreen.Login.name) {
+                popUpTo(ViverScreen.StartOrder.name) { inclusive = true } // Remove a tela anterior
+            }
+            hasNavigated = true
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
