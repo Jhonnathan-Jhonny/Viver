@@ -35,18 +35,14 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun StartOrderScreen(navController: NavHostController) {
-//    LaunchedEffect(key1 = true) {
-//        delay(4000) // Aguarda 3 segundos
-//        navController.navigate(ViverScreen.Login.name)
-//    }
     var hasNavigated by remember { mutableStateOf(false) }
 
     // Navega para a tela de Login após o delay, apenas uma vez
     LaunchedEffect(key1 = hasNavigated) {
         if (!hasNavigated) {
             delay(4000) // Aguarda 4 segundos
-            navController.navigate(ViverScreen.Login.name) {
-                popUpTo(ViverScreen.StartOrder.name) { inclusive = true } // Remove a tela anterior
+            navController.navigate(ViverScreen.SignUp.name) {
+                popUpTo(ViverScreen.StartOrder.name) { inclusive = true }
             }
             hasNavigated = true
         }
@@ -75,7 +71,7 @@ fun StartOrderScreen(navController: NavHostController) {
             text = "Bem vindo!",
             fontWeight = FontWeight.Bold,
             fontSize = 24.sp,
-            color = colorResource(id = R.color.primary_light),
+            color = colorResource(id = R.color.First),
             textAlign = TextAlign.Center
         )
 
@@ -85,7 +81,7 @@ fun StartOrderScreen(navController: NavHostController) {
         Text(
             text = "Descubra refeições saudáveis\npersonalizadas para o seu estilo de vida.",
             fontSize = 16.sp,
-            color =  colorResource(id = R.color.primary_light),
+            color =  colorResource(id = R.color.First),
             textAlign = TextAlign.Center
         )
 

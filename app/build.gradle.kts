@@ -69,6 +69,8 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation("androidx.compose.material:material-icons-extended:1.5.1")
+
 
     // Supabase
     implementation(platform("io.github.jan-tennert.supabase:bom:2.0.0-rc-1"))

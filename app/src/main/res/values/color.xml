@@ -1,55 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Light Theme -->
-    <color name="primary_light">#68B684</color>
-    <color name="on_primary_light">#FFFFFF</color>
-    <color name="primary_container_light">#73C28F</color>
-    <color name="on_primary_container_light">#002D16</color>
-    <color name="secondary_light">#3D6751</color>
-    <color name="on_secondary_light">#FFFFFF</color>
-    <color name="secondary_container_light">#AFDCC1</color>
-    <color name="on_secondary_container_light">#1C4531</color>
-    <color name="tertiary_light">#695E39</color>
-    <color name="on_tertiary_light">#FFFFFF</color>
-    <color name="tertiary_container_light">#FFF1C9</color>
-    <color name="on_tertiary_container_light">#5A502C</color>
-    <color name="error_light">#BA1A1A</color>
-    <color name="on_error_light">#FFFFFF</color>
-    <color name="error_container_light">#FFDAD6</color>
-    <color name="on_error_container_light">#410002</color>
-    <color name="background_light">#F7FAF4</color>
-    <color name="on_background_light">#181D19</color>
-    <color name="surface_light">#F7FAF4</color>
-    <color name="on_surface_light">#181D19</color>
-    <color name="surface_variant_light">#DBE5DA</color>
-    <color name="on_surface_variant_light">#3F4941</color>
-    <color name="outline_light">#6F7A70</color>
-    <color name="outline_variant_light">#BFC9BF</color>
-    <color name="scrim_light">#000000</color>
-    <color name="inverse_surface_light">#2D312D</color>
-    <color name="inverse_on_surface_light">#EEF2EB</color>
-    <color name="inverse_primary_light">#88D7A3</color>
-    <color name="surface_dim_light">#D7DBD5</color>
-    <color name="surface_bright_light">#F7FAF4</color>
-    <color name="surface_container_lowest_light">#FFFFFF</color>
-    <color name="surface_container_low_light">#F1F5EE</color>
-    <color name="surface_container_light">#EBEFE9</color>
-    <color name="surface_container_high_light">#E6E9E3</color>
-    <color name="surface_container_highest_light">#E0E4DD</color>
+    <color name="First">#68B684</color>
+    <color name="Second">#FFEFBF</color>
+    <color name="Third">#A8D5BA</color>
 
-    <!-- Medium Contrast Light Theme -->
-    <color name="primary_light_medium_contrast">#004E2B</color>
-    <color name="on_primary_light_medium_contrast">#FFFFFF</color>
-    <color name="primary_container_light_medium_contrast">#348355</color>
-    <color name="on_primary_container_light_medium_contrast">#FFFFFF</color>
-    <color name="secondary_light_medium_contrast">#214B36</color>
-    <color name="on_secondary_light_medium_contrast">#FFFFFF</color>
-    <color name="secondary_container_light_medium_contrast">#537D66</color>
-    <color name="on_secondary_container_light_medium_contrast">#FFFFFF</color>
-    <color name="tertiary_light_medium_contrast">#4C4220</color>
-    <color name="on_tertiary_light_medium_contrast">#FFFFFF</color>
-    <color name="tertiary_container_light_medium_contrast">#80744D</color>
-    <color name="on_tertiary_container_light_medium_contrast">#FFFFFF</color>
     <color name="error_light_medium_contrast">#8C0009</color>
     <color name="on_error_light_medium_contrast">#FFFFFF</color>
     <color name="error_container_light_medium_contrast">#DA342E</color>

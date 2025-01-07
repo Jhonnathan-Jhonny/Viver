@@ -39,6 +39,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.project.viver.ui.InitialLogoScreen
 import com.project.viver.ui.LoginScreen
+import com.project.viver.ui.SignUpScreen
 import com.project.viver.ui.StartOrderScreen
 
 enum class ViverScreen {
@@ -281,11 +282,14 @@ fun ViverApp(
                 StartOrderScreen(navController = navController)
             }
             composable(route = ViverScreen.Login.name) {
-                LoginScreen(navController = navController)
+                LoginScreen()
             }
-//                    composable(route = ViverScreen.SignUp.name) {
-//                        SignUpScreen(navController = navController)
-//                    }
+                    composable(route = ViverScreen.SignUp.name) {
+                        SignUpScreen(
+                            onSignUpButtonClicked = {navController.navigate(ViverScreen.ValidateEmail.name)},
+                            onBackLoginButtonClicked = {navController.navigate(ViverScreen.Login.name)}
+                        )
+                    }
 //                    composable(route = ViverScreen.Home.name) {
 //                        HomeScreen(navController = navController)
 //                    }
@@ -329,12 +333,12 @@ fun ViverApp(
 @Preview(showBackground = true)
 @Composable
 fun ViverAppPreview() {
-//    ViverApp()
-    ViverAppTopBar1(
-        currentScreen = ViverScreen.SignUp,
-        canNavigateBack = true,
-        navigateUp = { /* Simula navegação para a tela anterior */ }
-    )
+    ViverApp()
+//    ViverAppTopBar1(
+//        currentScreen = ViverScreen.SignUp,
+//        canNavigateBack = true,
+//        navigateUp = { /* Simula navegação para a tela anterior */ }
+//    )
 //    ViverAppTopBar2(
 //        currentScreen = ViverScreen.Home,
 //        canNavigateBack = true,
