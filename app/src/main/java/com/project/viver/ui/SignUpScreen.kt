@@ -2,6 +2,7 @@ package com.project.viver.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,23 +41,33 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.viver.R
 import com.project.viver.ViverScreen
+import com.project.viver.models.OrderUiStateUser
 
 @Composable
 fun SignUpScreen(
     onSignUpButtonClicked: () -> Unit,
-    onBackLoginButtonClicked: () -> Unit
+    onBackLoginButtonClicked: () -> Unit,
+    viewModel: ViverViewModel
 ) {
-    // Variáveis de estado
-    var nome by remember { mutableStateOf("") }
-    var sobrenome by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf("") }
+    var surname by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
-    var senha by remember { mutableStateOf("") }
-    var confirmarSenha by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var passwordConfirm by remember { mutableStateOf("") }
+
+    // Variáveis para controlar a visibilidade das senhas
+    var passwordVisible by remember { mutableStateOf(false) }
+    var passwordConfirmVisible by remember { mutableStateOf(false) }
+
+    // Variável para controlar o sexo selecionado
+    var selectedSex by remember { mutableStateOf("M") }
 
     Column(
         modifier = Modifier
@@ -75,8 +87,8 @@ fun SignUpScreen(
 
         // Nome
         TextBox(
-            value = nome,
-            onValueChange = { nome = it },
+            value = name,
+            onValueChange = { name = it },
             label = "Nome",
             leadingIcon = { Icon(painter = painterResource(id = R.drawable.person_icon), contentDescription = null) }
         )
@@ -85,8 +97,8 @@ fun SignUpScreen(
 
         // Sobrenome
         TextBox(
-            value = sobrenome,
-            onValueChange = { sobrenome = it },
+            value = surname,
+            onValueChange = { surname = it },
             label = "Sobrenome",
             leadingIcon = { Icon(painter = painterResource(id = R.drawable.person_icon), contentDescription = null) }
         )
@@ -105,24 +117,40 @@ fun SignUpScreen(
 
         // Senha
         TextBox(
-            value = senha,
-            onValueChange = { senha = it },
+            value = password,
+            onValueChange = { password = it },
             label = "Senha",
             leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
-            trailingIcon = { Icon(Icons.Default.Visibility, contentDescription = null) },
-            visualTransformation = PasswordVisualTransformation()
+            trailingIcon = {
+                Icon(
+                    imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                    contentDescription = null,
+                    modifier = Modifier.clickable {
+                        passwordVisible = !passwordVisible
+                    }
+                )
+            },
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation()
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         // Confirmar Senha
         TextBox(
-            value = confirmarSenha,
-            onValueChange = { confirmarSenha = it },
+            value = passwordConfirm,
+            onValueChange = { passwordConfirm = it },
             label = "Confirmar Senha",
             leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
-            trailingIcon = { Icon(Icons.Default.Visibility, contentDescription = null) },
-            visualTransformation = PasswordVisualTransformation()
+            trailingIcon = {
+                Icon(
+                    imageVector = if (passwordConfirmVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                    contentDescription = null,
+                    modifier = Modifier.clickable {
+                        passwordConfirmVisible = !passwordConfirmVisible
+                    }
+                )
+            },
+            visualTransformation = if (passwordConfirmVisible) VisualTransformation.None else PasswordVisualTransformation()
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -140,9 +168,10 @@ fun SignUpScreen(
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(end = 8.dp)
             )
+
             RadioButton(
-                selected = false,
-                onClick = {},
+                selected = selectedSex == "M",
+                onClick = { selectedSex = "M" },
                 colors = RadioButtonDefaults.colors(
                     selectedColor = color,
                     unselectedColor = color
@@ -157,8 +186,8 @@ fun SignUpScreen(
             )
 
             RadioButton(
-                selected = false,
-                onClick = {},
+                selected = selectedSex == "F",
+                onClick = { selectedSex = "F" },
                 colors = RadioButtonDefaults.colors(
                     selectedColor = color,
                     unselectedColor = color
@@ -173,8 +202,8 @@ fun SignUpScreen(
             )
 
             RadioButton(
-                selected = false,
-                onClick = {},
+                selected = selectedSex == "Outro",
+                onClick = { selectedSex = "Outro" },
                 colors = RadioButtonDefaults.colors(
                     selectedColor = color,
                     unselectedColor = color
@@ -188,16 +217,28 @@ fun SignUpScreen(
             )
         }
 
-
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = onSignUpButtonClicked,
+            onClick = {
+                if (password == passwordConfirm) {
+                    viewModel.saveUserToSupabase(
+                        OrderUiStateUser(
+                            name = name,
+                            surname = surname,
+                            email = email,
+                            password = password,
+                            sex = selectedSex
+                        )
+                    )
+                    onSignUpButtonClicked()
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
                 .size(height = 50.dp, width = 150.dp)
-                .border(1.dp, color = colorResource(id = R.color.First), shape = RoundedCornerShape(8.dp)), // Definindo a borda
+                .border(1.dp, color = colorResource(id = R.color.First), shape = RoundedCornerShape(8.dp)),
             colors = ButtonDefaults.buttonColors(Color.Transparent)
         ) {
             Text(
@@ -207,8 +248,6 @@ fun SignUpScreen(
             )
         }
 
-
-        // Botão para voltar ao login
         TextButton(onClick = onBackLoginButtonClicked) {
             Text(
                 text = "Já possui uma conta? Entre",
@@ -219,6 +258,7 @@ fun SignUpScreen(
     }
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextBox(
@@ -227,7 +267,7 @@ fun TextBox(
     label: String,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
-    visualTransformation: PasswordVisualTransformation = PasswordVisualTransformation()
+    visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
     OutlinedTextField(
         value = value,
@@ -250,8 +290,10 @@ fun TextBox(
 @Preview(showBackground = true)
 @Composable
 fun SignUpScreenPreview() {
+    val viewModel: ViverViewModel = viewModel()
     SignUpScreen(
         onSignUpButtonClicked = { ViverScreen.ValidateEmail },
-        onBackLoginButtonClicked = { ViverScreen.Login }
+        onBackLoginButtonClicked = { ViverScreen.Login },
+        viewModel = viewModel
     )
 }

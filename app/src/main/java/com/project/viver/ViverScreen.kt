@@ -32,6 +32,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -41,6 +42,7 @@ import com.project.viver.ui.InitialLogoScreen
 import com.project.viver.ui.LoginScreen
 import com.project.viver.ui.SignUpScreen
 import com.project.viver.ui.StartOrderScreen
+import com.project.viver.ui.ViverViewModel
 
 enum class ViverScreen {
     ConfirmPassword,
@@ -225,8 +227,10 @@ fun ViverAppTopBar2(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ViverApp(
+    viewModel: ViverViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -234,6 +238,7 @@ fun ViverApp(
         (backStackEntry?.destination?.route ?: ViverScreen.StartOrder.name).toString()
     )
     val canNavigateBack = navController.previousBackStackEntry != null
+
     Scaffold(
         topBar = {
             when (currentScreen) {
@@ -268,11 +273,11 @@ fun ViverApp(
                     // Caso não precise de nada, remova o bloco `else`.
                 }
             }
-        }
+        },
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = ViverScreen.Transition.name,
+            startDestination = ViverScreen.SignUp.name,
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(route = ViverScreen.Transition.name) {
@@ -286,7 +291,12 @@ fun ViverApp(
             }
                     composable(route = ViverScreen.SignUp.name) {
                         SignUpScreen(
-                            onSignUpButtonClicked = {navController.navigate(ViverScreen.ValidateEmail.name)},
+                            onSignUpButtonClicked = {
+                                navController.navigate(ViverScreen.Login.name){
+                                    popUpTo(ViverScreen.SignUp.name) { inclusive = true }
+                                }
+                            },
+                            viewModel = viewModel,
                             onBackLoginButtonClicked = {navController.navigate(ViverScreen.Login.name)}
                         )
                     }
