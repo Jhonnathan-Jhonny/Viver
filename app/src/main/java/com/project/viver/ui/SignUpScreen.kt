@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -61,13 +61,57 @@ fun SignUpScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordConfirm by remember { mutableStateOf("") }
-
-    // Variáveis para controlar a visibilidade das senhas
     var passwordVisible by remember { mutableStateOf(false) }
     var passwordConfirmVisible by remember { mutableStateOf(false) }
-
-    // Variável para controlar o sexo selecionado
     var selectedSex by remember { mutableStateOf("M") }
+
+    // Variáveis de erro
+    var nameError by remember { mutableStateOf("") }
+    var emailError by remember { mutableStateOf("") }
+    var passwordError by remember { mutableStateOf("") }
+    var passwordConfirmError by remember { mutableStateOf("") }
+
+    fun isValidEmail(email: String): Boolean =
+        Regex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+\$").matches(email)
+
+    fun isValidPassword(password: String): Boolean =
+        password.length >= 6 &&
+                password.any { it.isUpperCase() } &&
+                password.any { !it.isLetterOrDigit() }
+
+    fun validateFields(): Boolean {
+        var isValid = true
+
+        if (name.isBlank()) {
+            nameError = "O nome não pode ser vazio"
+            isValid = false
+        } else {
+            nameError = ""
+        }
+
+        if (!isValidEmail(email)) {
+            emailError = "O email deve ser válido (exemplo@dominio.com)"
+            isValid = false
+        } else {
+            emailError = ""
+        }
+
+        if (!isValidPassword(password)) {
+            passwordError = "A senha deve ter pelo menos 6 caracteres, uma letra maiúscula e um caractere especial"
+            isValid = false
+        } else {
+            passwordError = ""
+        }
+
+        if (password != passwordConfirm) {
+            passwordConfirmError = "As senhas não correspondem"
+            isValid = false
+        } else {
+            passwordConfirmError = ""
+        }
+
+        return isValid
+    }
 
     Column(
         modifier = Modifier
@@ -76,7 +120,6 @@ fun SignUpScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Título
         Text(
             text = "Faça seu cadastro",
             style = MaterialTheme.typography.titleLarge,
@@ -92,6 +135,9 @@ fun SignUpScreen(
             label = "Nome",
             leadingIcon = { Icon(painter = painterResource(id = R.drawable.person_icon), contentDescription = null) }
         )
+        if (nameError.isNotBlank()) {
+            Text(nameError, color = Color.Red, style = MaterialTheme.typography.bodySmall)
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -112,6 +158,9 @@ fun SignUpScreen(
             label = "E-mail*",
             leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) }
         )
+        if (emailError.isNotBlank()) {
+            Text(emailError, color = Color.Red, style = MaterialTheme.typography.bodySmall)
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -132,6 +181,9 @@ fun SignUpScreen(
             },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation()
         )
+        if (passwordError.isNotBlank()) {
+            Text(passwordError, color = Color.Red, style = MaterialTheme.typography.bodySmall)
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -152,9 +204,13 @@ fun SignUpScreen(
             },
             visualTransformation = if (passwordConfirmVisible) VisualTransformation.None else PasswordVisualTransformation()
         )
+        if (passwordConfirmError.isNotBlank()) {
+            Text(passwordConfirmError, color = Color.Red, style = MaterialTheme.typography.bodySmall)
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Sexo
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
@@ -175,15 +231,15 @@ fun SignUpScreen(
                 colors = RadioButtonDefaults.colors(
                     selectedColor = color,
                     unselectedColor = color
-                ),
-                modifier = Modifier.padding(end = 4.dp)
+                )
             )
             Text(
                 text = "M",
                 color = color,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(end = 8.dp)
+                style = MaterialTheme.typography.bodyMedium
             )
+
+            Spacer(modifier = Modifier.width(16.dp))
 
             RadioButton(
                 selected = selectedSex == "F",
@@ -191,15 +247,15 @@ fun SignUpScreen(
                 colors = RadioButtonDefaults.colors(
                     selectedColor = color,
                     unselectedColor = color
-                ),
-                modifier = Modifier.padding(end = 4.dp)
+                )
             )
             Text(
                 text = "F",
                 color = color,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(end = 8.dp)
+                style = MaterialTheme.typography.bodyMedium
             )
+
+            Spacer(modifier = Modifier.width(16.dp))
 
             RadioButton(
                 selected = selectedSex == "Outro",
@@ -207,8 +263,7 @@ fun SignUpScreen(
                 colors = RadioButtonDefaults.colors(
                     selectedColor = color,
                     unselectedColor = color
-                ),
-                modifier = Modifier.padding(end = 4.dp)
+                )
             )
             Text(
                 text = "Outro",
@@ -219,9 +274,10 @@ fun SignUpScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Botão de cadastro
         Button(
             onClick = {
-                if (password == passwordConfirm) {
+                if (validateFields()) {
                     viewModel.saveUserToSupabase(
                         OrderUiStateUser(
                             name = name,
@@ -237,7 +293,7 @@ fun SignUpScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
-                .size(height = 50.dp, width = 150.dp)
+                .height(50.dp)
                 .border(1.dp, color = colorResource(id = R.color.First), shape = RoundedCornerShape(8.dp)),
             colors = ButtonDefaults.buttonColors(Color.Transparent)
         ) {
@@ -248,6 +304,8 @@ fun SignUpScreen(
             )
         }
 
+        Spacer(modifier = Modifier.height(8.dp))
+
         TextButton(onClick = onBackLoginButtonClicked) {
             Text(
                 text = "Já possui uma conta? Entre",
@@ -257,6 +315,7 @@ fun SignUpScreen(
         }
     }
 }
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -272,12 +331,19 @@ fun TextBox(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label) },
+        label = {
+            Text(
+                text = label,
+                color = colorResource(id = R.color.Third),
+                style = MaterialTheme.typography.bodyLarge
+            )
+        },
         leadingIcon = { leadingIcon?.invoke() },
         trailingIcon = { trailingIcon?.invoke() },
         visualTransformation = visualTransformation,
         shape = RoundedCornerShape(16.dp),
         colors = TextFieldDefaults.outlinedTextFieldColors(
+            cursorColor = colorResource(id = R.color.Third),
             focusedBorderColor = colorResource(id = R.color.Third),
             unfocusedBorderColor = colorResource(id = R.color.Third),
         ),
