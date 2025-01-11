@@ -277,7 +277,7 @@ fun ViverApp(
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = ViverScreen.SignUp.name,
+            startDestination = ViverScreen.Transition.name,
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(route = ViverScreen.Transition.name) {
@@ -287,19 +287,19 @@ fun ViverApp(
                 StartOrderScreen(navController = navController)
             }
             composable(route = ViverScreen.Login.name) {
-                LoginScreen()
+                LoginScreen(onSignUpButtonClicked = {navController.navigate(ViverScreen.SignUp.name)})
             }
-                    composable(route = ViverScreen.SignUp.name) {
-                        SignUpScreen(
-                            onSignUpButtonClicked = {
-                                navController.navigate(ViverScreen.Login.name){
-                                    popUpTo(ViverScreen.SignUp.name) { inclusive = true }
-                                }
-                            },
-                            viewModel = viewModel,
-                            onBackLoginButtonClicked = {navController.navigate(ViverScreen.Login.name)}
-                        )
-                    }
+            composable(route = ViverScreen.SignUp.name) {
+                SignUpScreen(
+                    onSignUpButtonClicked = {
+                        navController.navigate(ViverScreen.Login.name){
+                            popUpTo(ViverScreen.SignUp.name) { inclusive = true }
+                        }
+                    },
+                    viewModel = viewModel,
+                    onBackLoginButtonClicked = {navController.navigate(ViverScreen.Login.name)}
+                )
+            }
 //                    composable(route = ViverScreen.Home.name) {
 //                        HomeScreen(navController = navController)
 //                    }
@@ -345,7 +345,7 @@ fun ViverApp(
 fun ViverAppPreview() {
     ViverApp()
 //    ViverAppTopBar1(
-//        currentScreen = ViverScreen.SignUp,
+//        currentScreen = ViverScreen.Login,
 //        canNavigateBack = true,
 //        navigateUp = { /* Simula navegação para a tela anterior */ }
 //    )

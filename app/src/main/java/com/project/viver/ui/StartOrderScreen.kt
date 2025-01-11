@@ -41,7 +41,7 @@ fun StartOrderScreen(navController: NavHostController) {
     LaunchedEffect(key1 = hasNavigated) {
         if (!hasNavigated) {
             delay(4000) // Aguarda 4 segundos
-            navController.navigate(ViverScreen.SignUp.name) {
+            navController.navigate(ViverScreen.Login.name) {
                 popUpTo(ViverScreen.StartOrder.name) { inclusive = true }
             }
             hasNavigated = true
