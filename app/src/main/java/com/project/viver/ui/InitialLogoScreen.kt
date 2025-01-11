@@ -21,7 +21,9 @@ import kotlinx.coroutines.delay
 fun InitialLogoScreen(navController: NavHostController) {
     LaunchedEffect(key1 = true) {
         delay(2000)
-        navController.navigate(ViverScreen.StartOrder.name)
+        navController.navigate(ViverScreen.StartOrder.name){
+            popUpTo(ViverScreen.Transition.name) { inclusive = true }
+        }
     }
     Box(
         modifier = Modifier

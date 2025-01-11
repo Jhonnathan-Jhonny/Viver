@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,11 +37,9 @@ import kotlinx.coroutines.delay
 @Composable
 fun StartOrderScreen(navController: NavHostController) {
     var hasNavigated by remember { mutableStateOf(false) }
-
-    // Navega para a tela de Login após o delay, apenas uma vez
     LaunchedEffect(key1 = hasNavigated) {
         if (!hasNavigated) {
-            delay(4000) // Aguarda 4 segundos
+            delay(4000)
             navController.navigate(ViverScreen.Login.name) {
                 popUpTo(ViverScreen.StartOrder.name) { inclusive = true }
             }
@@ -79,7 +78,7 @@ fun StartOrderScreen(navController: NavHostController) {
 
         // Subtitle
         Text(
-            text = "Descubra refeições saudáveis\npersonalizadas para o seu estilo de vida.",
+            text = stringResource(R.string.descubra_refei_es_saud_veis_personalizadas_para_o_seu_estilo_de_vida),
             fontSize = 16.sp,
             color =  colorResource(id = R.color.First),
             textAlign = TextAlign.Center

@@ -1,7 +1,6 @@
 package com.project.viver.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,20 +11,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
@@ -33,7 +25,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,8 +38,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,6 +49,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.viver.R
 import com.project.viver.ViverScreen
 import com.project.viver.models.OrderUiStateUser
+import com.project.viver.models.SingleButton
+import com.project.viver.models.TextBox
 import kotlinx.coroutines.launch
 
 @Composable
@@ -140,7 +133,7 @@ fun SignUpScreen(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Faça seu cadastro",
+                text = stringResource(R.string.fa_a_seu_cadastro),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = colorResource(id = R.color.First),
@@ -150,7 +143,7 @@ fun SignUpScreen(
             TextBox(
                 value = name,
                 onValueChange = { name = it },
-                label = "Nome",
+                label = stringResource(R.string.nome),
                 leadingIcon = {
                     Icon(
                         painter = painterResource(id = R.drawable.person_icon),
@@ -168,7 +161,7 @@ fun SignUpScreen(
             TextBox(
                 value = surname,
                 onValueChange = { surname = it },
-                label = "Sobrenome",
+                label = stringResource(R.string.sobrenome),
                 leadingIcon = {
                     Icon(
                         painter = painterResource(id = R.drawable.person_icon),
@@ -183,7 +176,7 @@ fun SignUpScreen(
             TextBox(
                 value = email,
                 onValueChange = { email = it },
-                label = "E-mail*",
+                label = stringResource(R.string.e_mail),
                 leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
                 onNext = { focusManager.moveFocus(FocusDirection.Down) }
             )
@@ -196,7 +189,7 @@ fun SignUpScreen(
             TextBox(
                 value = password,
                 onValueChange = { password = it },
-                label = "Senha",
+                label = stringResource(R.string.senha),
                 leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                 trailingIcon = {
                     Icon(
@@ -219,7 +212,7 @@ fun SignUpScreen(
             TextBox(
                 value = passwordConfirm,
                 onValueChange = { passwordConfirm = it },
-                label = "Confirmar Senha",
+                label = stringResource(R.string.confirmar_senha),
                 leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                 trailingIcon = {
                     Icon(
@@ -247,7 +240,7 @@ fun SignUpScreen(
                 val color = colorResource(id = R.color.Third)
 
                 Text(
-                    text = "Sexo",
+                    text = stringResource(R.string.sexo),
                     color = colorResource(id = R.color.First),
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(end = 8.dp)
@@ -294,7 +287,7 @@ fun SignUpScreen(
                     )
                 )
                 Text(
-                    text = "Outro",
+                    text = stringResource(R.string.outro),
                     color = color,
                     style = MaterialTheme.typography.bodyMedium
                 )
@@ -302,60 +295,47 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(
+            SingleButton(
                 onClick = {
                     if (validateFields()) {
-                        isLoading = true
-                        viewModel.isEmailAvailable(email) { emailAvailable ->
-                            if (emailAvailable) {
-                                viewModel.saveUserToSupabase(
-                                    OrderUiStateUser(
-                                        name = name,
-                                        surname = surname,
-                                        email = email,
-                                        password = password,
-                                        sex = selectedSex
-                                    )
+                    isLoading = true
+                    viewModel.isEmailAvailable(email) { emailAvailable ->
+                        if (emailAvailable) {
+                            viewModel.saveUserToSupabase(
+                                OrderUiStateUser(
+                                    name = name,
+                                    surname = surname,
+                                    email = email,
+                                    password = password,
+                                    sex = selectedSex
                                 )
-                                scope.launch {
-                                    snackbarHostState.showSnackbar("Cadastro realizado com sucesso!")
-                                    onSignUpButtonClicked()
-                                }
-                            } else {
-                                emailError = "E-mail já cadastrado!"
+                            )
+                            scope.launch {
+                                snackbarHostState.showSnackbar("Cadastro realizado com sucesso!")
+                                onSignUpButtonClicked()
                             }
-                            isLoading = false
+                        } else {
+                            emailError = "E-mail já cadastrado!"
                         }
+                        isLoading = false
+                    }
                     } else {
                         scope.launch {
                             snackbarHostState.showSnackbar("Erro ao validar os campos!")
                         }
                     }
                 },
-                enabled = !isLoading,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .height(50.dp)
-                    .border(
-                        1.dp,
-                        color = colorResource(id = R.color.First),
-                        shape = RoundedCornerShape(8.dp)
-                    ),
-                colors = ButtonDefaults.buttonColors(Color.Transparent)
-            ) {
-                Text(
-                    text = "Cadastrar",
-                    color = colorResource(id = R.color.First),
-                    fontSize = 18.sp
-                )
-            }
+                isLoading = isLoading,
+                buttonName = stringResource(R.string.cadastrar),
+                colorButton = Color.Transparent,
+                colorText = colorResource(id = R.color.First)
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             TextButton(onClick = onBackLoginButtonClicked) {
                 Text(
-                    text = "Já possui uma conta? Entre",
+                    text = stringResource(R.string.j_possui_uma_conta_entre),
                     color = colorResource(id = R.color.First),
                     fontSize = 15.sp
                 )
@@ -363,56 +343,6 @@ fun SignUpScreen(
         }
     }
 }
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TextBox(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String,
-    leadingIcon: @Composable (() -> Unit)? = null,
-    trailingIcon: @Composable (() -> Unit)? = null,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
-    onNext: (() -> Unit)? = null // Callback para avançar ao próximo campo
-) {
-    val focusManager = LocalFocusManager.current
-
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = {
-            Text(
-                text = label,
-                color = colorResource(id = R.color.Third),
-                style = MaterialTheme.typography.bodyLarge
-            )
-        },
-        leadingIcon = { leadingIcon?.invoke() },
-        trailingIcon = { trailingIcon?.invoke() },
-        visualTransformation = visualTransformation,
-        shape = RoundedCornerShape(16.dp),
-        colors = TextFieldDefaults.outlinedTextFieldColors(
-            cursorColor = colorResource(id = R.color.Third),
-            focusedBorderColor = colorResource(id = R.color.Third),
-            unfocusedBorderColor = colorResource(id = R.color.Third),
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        keyboardOptions = KeyboardOptions.Default.copy(
-            imeAction = if (onNext != null) ImeAction.Next else ImeAction.Done
-        ),
-        keyboardActions = KeyboardActions(
-            onNext = {
-                onNext?.invoke() ?: focusManager.moveFocus(FocusDirection.Down)
-            },
-            onDone = {
-                focusManager.clearFocus()
-            }
-        )
-    )
-}
-
 
 @Preview(showBackground = true)
 @Composable

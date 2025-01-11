@@ -4,4 +4,18 @@
     <string name="logo">Logo</string>
     <string name="star_trajectory">Star Trajectory</string>
     <string name="icone_para_ir_para_perfil">Icone para ir para perfil</string>
+    <string name="descubra_refei_es_saud_veis_personalizadas_para_o_seu_estilo_de_vida">Descubra refeições saudáveis\npersonalizadas para o seu estilo de vida.</string>
+    <string name="j_possui_uma_conta_entre">Já possui uma conta? Entre</string>
+    <string name="cadastrar">Cadastrar</string>
+    <string name="outro">Outro</string>
+    <string name="sexo">Sexo</string>
+    <string name="confirmar_senha">Confirmar Senha</string>
+    <string name="senha">Senha</string>
+    <string name="e_mail">E-mail*</string>
+    <string name="sobrenome">Sobrenome</string>
+    <string name="nome">Nome</string>
+    <string name="fa_a_seu_cadastro">Faça seu cadastro</string>
+    <string name="esqueci_minha_senha">Esqueci minha senha</string>
+    <string name="entrar">Entrar</string>
+    <string name="cadastre_se">Cadastre-se</string>
 </resources>
