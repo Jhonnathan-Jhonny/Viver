@@ -1,10 +1,10 @@
-package com.project.viver.models
+package com.project.viver.data.models
 
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class OrderUiStateUser (
-    val id: Int = 0,
+    val idAuth: String = "",
     val name: String = "",
     val surname: String = "",
     val email: String = "",

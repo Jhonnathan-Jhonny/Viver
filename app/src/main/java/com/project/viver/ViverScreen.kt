@@ -23,11 +23,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,7 +44,6 @@ import com.project.viver.ui.InitialLogoScreen
 import com.project.viver.ui.LoginScreen
 import com.project.viver.ui.SignUpScreen
 import com.project.viver.ui.StartOrderScreen
-import com.project.viver.ui.ViverViewModel
 
 enum class ViverScreen {
     ConfirmPassword,
@@ -226,8 +227,6 @@ fun ViverAppTopBar2(
     )
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ViverApp(
     viewModel: ViverViewModel = viewModel(),
@@ -238,6 +237,14 @@ fun ViverApp(
         (backStackEntry?.destination?.route ?: ViverScreen.StartOrder.name).toString()
     )
     val canNavigateBack = navController.previousBackStackEntry != null
+
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.isUserLoggedIn(
+            context
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -297,6 +304,7 @@ fun ViverApp(
                         }
                     },
                     viewModel = viewModel,
+                    context = context,
                     onBackLoginButtonClicked = {navController.navigate(ViverScreen.Login.name)}
                 )
             }

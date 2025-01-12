@@ -1,4 +1,4 @@
-package com.project.viver.models
+package com.project.viver.data.models
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -10,6 +10,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -85,7 +86,7 @@ fun SingleButton(
     buttonName: String,
     colorButton: Color,
     colorText: Color
-){
+) {
     Button(
         onClick = onClick,
         enabled = !isLoading,
@@ -102,14 +103,18 @@ fun SingleButton(
             ),
         colors = ButtonDefaults.buttonColors(Color.Transparent)
     ) {
-        Text(
-            text = buttonName,
-            color = colorText,
-            fontSize = 22.sp,
-        )
+        if (isLoading) {
+            CircularProgressIndicator(color = colorText)
+        } else {
+            Text(
+                text = buttonName,
+                color = colorText,
+                fontSize = 22.sp,
+            )
+        }
     }
-
 }
+
 
 @Preview(showBackground = true)
 @Composable

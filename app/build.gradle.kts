@@ -76,15 +76,7 @@ dependencies {
     implementation("io.github.jan-tennert.supabase:postgrest-kt")
     implementation("io.ktor:ktor-client-android:2.3.7")
 
-    implementation("at.favre.lib:bcrypt:0.10.2")
+    implementation("org.slf4j:slf4j-api:1.7.32")
+    implementation("org.slf4j:slf4j-simple:1.7.32")
 
-//    // Para realizar requisições HTTP
-//    implementation("com.squareup.okhttp3:okhttp:4.9.3")
-//
-//    // Para geração de UUID (identificadores únicos)
-//    implementation("com.benasher44:uuid:0.7.0")
-//
-//    // Para integração com o Supabase
-//    implementation("io.supabase:supabase-kt:1.0.0")
-//
 }

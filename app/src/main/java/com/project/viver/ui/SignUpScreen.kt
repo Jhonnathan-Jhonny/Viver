@@ -1,5 +1,6 @@
 package com.project.viver.ui
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -47,17 +48,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.viver.R
-import com.project.viver.ViverScreen
-import com.project.viver.models.OrderUiStateUser
-import com.project.viver.models.SingleButton
-import com.project.viver.models.TextBox
-import kotlinx.coroutines.launch
+import com.project.viver.ViverViewModel
+import com.project.viver.data.models.OrderUiStateUser
+import com.project.viver.data.models.SingleButton
+import com.project.viver.data.models.TextBox
 
 @Composable
 fun SignUpScreen(
     onSignUpButtonClicked: () -> Unit,
     onBackLoginButtonClicked: () -> Unit,
-    viewModel: ViverViewModel
+    viewModel: ViverViewModel,
+    context: Context,
 ) {
     var name by remember { mutableStateOf("") }
     var surname by remember { mutableStateOf("") }
@@ -298,31 +299,18 @@ fun SignUpScreen(
             SingleButton(
                 onClick = {
                     if (validateFields()) {
-                    isLoading = true
-                    viewModel.isEmailAvailable(email) { emailAvailable ->
-                        if (emailAvailable) {
-                            viewModel.saveUserToSupabase(
-                                OrderUiStateUser(
-                                    name = name,
-                                    surname = surname,
-                                    email = email,
-                                    password = password,
-                                    sex = selectedSex
-                                )
-                            )
-                            scope.launch {
-                                snackbarHostState.showSnackbar("Cadastro realizado com sucesso!")
-                                onSignUpButtonClicked()
-                            }
-                        } else {
-                            emailError = "E-mail já cadastrado!"
-                        }
-                        isLoading = false
-                    }
-                    } else {
-                        scope.launch {
-                            snackbarHostState.showSnackbar("Erro ao validar os campos!")
-                        }
+                        isLoading = true
+                        viewModel.signUpUser(
+                            context,
+                            OrderUiStateUser(
+                                name = name,
+                                surname = surname,
+                                email = email,
+                                password = password,
+                                sex = selectedSex
+                            ),
+                        )
+                        onSignUpButtonClicked()
                     }
                 },
                 isLoading = isLoading,
@@ -348,9 +336,10 @@ fun SignUpScreen(
 @Composable
 fun SignUpScreenPreview() {
     val viewModel: ViverViewModel = viewModel()
-    SignUpScreen(
-        onSignUpButtonClicked = { ViverScreen.ValidateEmail },
-        onBackLoginButtonClicked = { ViverScreen.Login },
-        viewModel = viewModel
-    )
+//    SignUpScreen(
+//        onSignUpButtonClicked = { ViverScreen.ValidateEmail },
+//        onBackLoginButtonClicked = { ViverScreen.Login },
+//        viewModel = viewModel,
+//        context =
+//    )
 }

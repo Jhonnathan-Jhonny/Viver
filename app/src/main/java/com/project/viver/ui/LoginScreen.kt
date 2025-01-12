@@ -41,8 +41,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.project.viver.R
 import com.project.viver.ViverScreen
-import com.project.viver.models.SingleButton
-import com.project.viver.models.TextBox
+import com.project.viver.data.models.SingleButton
+import com.project.viver.data.models.TextBox
 
 @Composable
 fun LoginScreen(onSignUpButtonClicked: () -> Unit) {
