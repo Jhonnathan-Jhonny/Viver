@@ -1,5 +1,6 @@
 package com.project.viver.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -48,11 +50,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.viver.R
+import com.project.viver.ViverScreen
 import com.project.viver.ViverViewModel
 import com.project.viver.data.models.OrderUiStateUser
 import com.project.viver.data.models.SingleButton
 import com.project.viver.data.models.TextBox
+import com.project.viver.data.models.UserState
+import kotlinx.coroutines.launch
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SignUpScreen(
     onSignUpButtonClicked: () -> Unit,
@@ -125,7 +131,7 @@ fun SignUpScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
-    ) { padding ->
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -300,17 +306,24 @@ fun SignUpScreen(
                 onClick = {
                     if (validateFields()) {
                         isLoading = true
-                        viewModel.signUpUser(
-                            context,
-                            OrderUiStateUser(
-                                name = name,
-                                surname = surname,
-                                email = email,
-                                password = password,
-                                sex = selectedSex
-                            ),
-                        )
-                        onSignUpButtonClicked()
+                        scope.launch {
+                            val result = viewModel.signUpUser(
+                                context,
+                                OrderUiStateUser(
+                                    name = name,
+                                    surname = surname,
+                                    email = email,
+                                    password = password,
+                                    sex = selectedSex
+                                )
+                            )
+                            isLoading = false
+                            if (result is UserState.Success) {
+                                onSignUpButtonClicked()
+                            } else if (result is UserState.Error) {
+                                snackbarHostState.showSnackbar("Email já cadastrado")
+                            }
+                        }
                     }
                 },
                 isLoading = isLoading,
@@ -318,6 +331,7 @@ fun SignUpScreen(
                 colorButton = Color.Transparent,
                 colorText = colorResource(id = R.color.First)
             )
+
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -336,10 +350,11 @@ fun SignUpScreen(
 @Composable
 fun SignUpScreenPreview() {
     val viewModel: ViverViewModel = viewModel()
-//    SignUpScreen(
-//        onSignUpButtonClicked = { ViverScreen.ValidateEmail },
-//        onBackLoginButtonClicked = { ViverScreen.Login },
-//        viewModel = viewModel,
-//        context =
-//    )
+    val context: Context = LocalContext.current
+    SignUpScreen(
+        onSignUpButtonClicked = { ViverScreen.ValidateEmail },
+        onBackLoginButtonClicked = { ViverScreen.Login },
+        viewModel = viewModel,
+        context = context
+    )
 }

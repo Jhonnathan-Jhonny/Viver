@@ -1,5 +1,7 @@
 package com.project.viver.ui
 
+import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -9,14 +11,17 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,14 +43,27 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.project.viver.R
 import com.project.viver.ViverScreen
+import com.project.viver.ViverViewModel
 import com.project.viver.data.models.SingleButton
 import com.project.viver.data.models.TextBox
+import com.project.viver.data.models.UserState
+import kotlinx.coroutines.launch
 
+//Tratar erros de email ou senha errada
+
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun LoginScreen(onSignUpButtonClicked: () -> Unit) {
+fun LoginScreen(
+    onSignUpButtonClicked: () -> Unit,
+    onForgotPasswordButtonClicked: () -> Unit,
+    onLoginButtonClicked: () -> Unit,
+    viewModel: ViverViewModel,
+    context: Context
+) {
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
@@ -54,104 +72,157 @@ fun LoginScreen(onSignUpButtonClicked: () -> Unit) {
     val focusManager = LocalFocusManager.current
     var isLoading by remember { mutableStateOf(false) }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "Entre em sua conta",
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp,
-                color = Color(0xFF4CAF50)
-            )
+    var emailError by remember { mutableStateOf("") }
+    var passwordError by remember { mutableStateOf("") }
 
-            Spacer(modifier = Modifier.height(32.dp))
-
-            TextBox(
-                value = email.value,
-                onValueChange = { email.value = it },
-                label = stringResource(id = R.string.e_mail),
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Email,
-                        contentDescription = "E-mail Icon"
-                    )
-                },
-                onNext = { focusManager.moveFocus(FocusDirection.Down) }
-            )
+    var isValid by remember { mutableStateOf(true) }
+    val snackbarHostState = remember { SnackbarHostState() }
 
 
-            Spacer(modifier = Modifier.height(32.dp))
-
-            TextBox(
-                value = password.value,
-                onValueChange = { password.value = it },
-                label = stringResource(id = R.string.senha),
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Lock,
-                        contentDescription = "Senha Icon"
-                    )
-                },
-                trailingIcon = {
-                    Icon(
-                        imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                        contentDescription = null,
-                        modifier = Modifier.clickable {
-                            passwordVisible = !passwordVisible
-                        }
-                    )
-                },
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                onNext = { focusManager.clearFocus() }
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = stringResource(R.string.esqueci_minha_senha),
-                color = colorResource(id = R.color.Third),
-                fontSize = 14.sp,
-                textDecoration = TextDecoration.Underline,
-                modifier = Modifier.align(Alignment.End)
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-            
-            SingleButton(
-                onClick = { /*TODO*/ },
-                isLoading = isLoading,
-                buttonName = stringResource(R.string.entrar),
-                colorButton = colorResource(id = R.color.First),
-                colorText = Color.White
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            SingleButton(
-                onClick = { onSignUpButtonClicked() },
-                isLoading = isLoading,
-                buttonName = stringResource(R.string.cadastre_se),
-                colorButton = Color.Transparent,
-                colorText = colorResource(id = R.color.First)
-            )
+    fun validateFields(): Boolean {
+        isValid = true
+        if (email.value.isBlank()) {
+            isValid = false
+        } else {
+            emailError = ""
         }
+
+        if (password.value.isBlank()) {
+            isValid = false
+        } else {
+            passwordError = ""
+        }
+        return isValid
     }
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        content = {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.White),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "Entre em sua conta",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp,
+                    color = Color(0xFF4CAF50)
+                )
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                TextBox(
+                    value = email.value,
+                    onValueChange = { email.value = it },
+                    label = stringResource(id = R.string.e_mail),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Email,
+                            contentDescription = "E-mail Icon"
+                        )
+                    },
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) },
+                    errorMessage = !isValid
+                )
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                TextBox(
+                    value = password.value,
+                    onValueChange = { password.value = it },
+                    label = stringResource(id = R.string.senha),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Lock,
+                            contentDescription = "Senha Icon"
+                        )
+                    },
+                    trailingIcon = {
+                        Icon(
+                            imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                            contentDescription = null,
+                            modifier = Modifier.clickable {
+                                passwordVisible = !passwordVisible
+                            }
+                        )
+                    },
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    onNext = { focusManager.clearFocus() },
+                    errorMessage = !isValid
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                TextButton(onClick = onForgotPasswordButtonClicked) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.CenterEnd
+                    ) {
+                        Text(
+                            text = stringResource(R.string.esqueci_minha_senha),
+                            color = colorResource(id = R.color.Third),
+                            fontSize = 14.sp,
+                            textDecoration = TextDecoration.Underline
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                SingleButton(
+                    onClick = {
+                        scope.launch {
+                            if (email.value == "admin" && password.value == "admin") {
+                                onLoginButtonClicked()
+                            } else if (validateFields()) {
+                                isLoading = true
+                                val result = viewModel.logInUser(context, email.value, password.value)
+                                isLoading = false
+                                if (result is UserState.Success) {
+                                    onLoginButtonClicked()
+                                }
+                                else if (result is UserState.Error) {
+                                    snackbarHostState.showSnackbar(result.message)
+                                }
+                            }
+                        }
+                    },
+                    isLoading = isLoading,
+                    buttonName = stringResource(R.string.entrar),
+                    colorButton = colorResource(id = R.color.First),
+                    colorText = Color.White
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                SingleButton(
+                    onClick = { onSignUpButtonClicked() },
+                    isLoading = isLoading,
+                    buttonName = stringResource(R.string.cadastre_se),
+                    colorButton = Color.Transparent,
+                    colorText = colorResource(id = R.color.First)
+                )
+            }
+        }
+    )
+
 }
 
 @Preview(showBackground = true)
 @Composable
 fun PreviewWelcomeScreen() {
     val navController = NavController(LocalContext.current)
-    LoginScreen {
-        navController.navigate(ViverScreen.SignUp.name)
-    }
+    val viewModel: ViverViewModel = viewModel()
+    val context = LocalContext.current
+
+    LoginScreen(
+        { navController.navigate(ViverScreen.SignUp.name) },
+        { navController.navigate(ViverScreen.ForgotPassword.name) },
+        { navController.navigate(ViverScreen.Home.name) },
+        viewModel,
+        context
+    )
 }

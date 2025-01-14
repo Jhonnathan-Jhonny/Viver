@@ -1,5 +1,6 @@
 package com.project.viver.ui
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -13,10 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,20 +29,21 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.project.viver.R
 import com.project.viver.ViverScreen
+import com.project.viver.ViverViewModel
+import com.project.viver.data.models.UserState
 import kotlinx.coroutines.delay
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun StartOrderScreen(navController: NavHostController) {
-    var hasNavigated by remember { mutableStateOf(false) }
-    LaunchedEffect(key1 = hasNavigated) {
-        if (!hasNavigated) {
-            delay(4000)
-            navController.navigate(ViverScreen.Login.name) {
-                popUpTo(ViverScreen.StartOrder.name) { inclusive = true }
-            }
-            hasNavigated = true
-        }
+fun StartOrderScreen(
+    navController: NavHostController,
+    viewModel: ViverViewModel
+) {
+    // Atraso de 4 segundos para exibir a tela de boas-vindas
+    LaunchedEffect(key1 = true) {
+        delay(4000) // Espera por 4 segundos
     }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -56,7 +54,7 @@ fun StartOrderScreen(navController: NavHostController) {
 
         // Logo
         Image(
-            painter = painterResource(id = R.drawable.colorful_logo), // Replace with your logo resource
+            painter = painterResource(id = R.drawable.colorful_logo),
             contentDescription = "App Logo",
             modifier = Modifier
                 .size(width = 205.dp, height = 203.dp),
@@ -80,13 +78,13 @@ fun StartOrderScreen(navController: NavHostController) {
         Text(
             text = stringResource(R.string.descubra_refei_es_saud_veis_personalizadas_para_o_seu_estilo_de_vida),
             fontSize = 16.sp,
-            color =  colorResource(id = R.color.First),
+            color = colorResource(id = R.color.First),
             textAlign = TextAlign.Center
         )
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // Bottom wave-like shape (or green background)
+        // Bottom wave-like shape
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -97,29 +95,25 @@ fun StartOrderScreen(navController: NavHostController) {
                     .fillMaxWidth()
                     .height(300.dp)
             ) {
-                val waveHeight = 80f // Maior altura para a onda
-                val waveWidth = size.width // Largura total do Canvas
+                val waveHeight = 80f
+                val waveWidth = size.width
 
                 val path = androidx.compose.ui.graphics.Path().apply {
-                    // Começa no canto superior esquerdo
                     moveTo(0f, waveHeight)
-                    // Cria a curva arredondada mais acentuada
                     cubicTo(
-                        waveWidth / 4, -waveHeight, // Primeiro ponto de controle (acima do eixo X)
-                        3 * waveWidth / 4, 5 * waveHeight, // Segundo ponto de controle (abaixo do eixo X)
-                        waveWidth, waveHeight // Ponto final (no canto superior direito)
+                        waveWidth / 4, -waveHeight,
+                        3 * waveWidth / 4, 5 * waveHeight,
+                        waveWidth, waveHeight
                     )
-                    // Continua desenhando os lados e a parte inferior do Box
                     lineTo(waveWidth, size.height)
                     lineTo(0f, size.height)
                     close()
                 }
 
-                // Desenha o fundo com a onda mais curvada
-                drawPath(path = path, color = Color(0xFF68B684))  // Cor diretamente em hexadecimal
+                drawPath(path = path, color = Color(0xFF68B684))
             }
 
-            // Adiciona o texto no centro do Box
+            // Adiciona o texto no centro
             Text(
                 text = "Vamos lá!",
                 fontWeight = FontWeight.Bold,
@@ -130,11 +124,43 @@ fun StartOrderScreen(navController: NavHostController) {
             )
         }
     }
+
+    // Navegação para tela seguinte, com base no estado do token
+    LaunchedEffect(key1 = viewModel.uiState.value) {
+        when (val state = viewModel.uiState.value) {
+            is UserState.Loading -> {
+                // O loading pode ser tratado se necessário
+            }
+            is UserState.Error -> {
+                val errorMessage = (state as? UserState.Error)?.message ?: "Unknown error"
+                navController.navigate(ViverScreen.Login.name) {
+                    popUpTo(ViverScreen.StartOrder.name) { inclusive = true }
+                }
+            }
+            is UserState.Success -> {
+                delay(4000) // Espera mais 4 segundos para garantir tempo suficiente
+                navController.navigate(ViverScreen.Login.name) {
+                    popUpTo(ViverScreen.StartOrder.name) { inclusive = true }
+                }
+            }
+        }
+    }
+
+    // Adicionando um atraso fixo para garantir que a tela de boas-vindas seja visível
+    LaunchedEffect(key1 = true) {
+        delay(4000) // Isso garante que a tela será visível por 4 segundos
+    }
 }
+
+
 
 @Preview(showBackground = true)
 @Composable
 fun StartOrderScreenPreview() {
     val navController = rememberNavController()
-    StartOrderScreen(navController = navController)
+    val viewModel = ViverViewModel()
+    StartOrderScreen(
+        navController = navController,
+        viewModel
+    )
 }

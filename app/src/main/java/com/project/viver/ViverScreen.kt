@@ -40,6 +40,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.project.viver.ui.ForgotPasswordScreen
+import com.project.viver.ui.HomeScreen
 import com.project.viver.ui.InitialLogoScreen
 import com.project.viver.ui.LoginScreen
 import com.project.viver.ui.SignUpScreen
@@ -240,6 +242,8 @@ fun ViverApp(
 
     val context = LocalContext.current
 
+    val isLoggedIn = viewModel.checkIfUserLoggedIn(context)
+
     LaunchedEffect(Unit) {
         viewModel.isUserLoggedIn(
             context
@@ -288,13 +292,25 @@ fun ViverApp(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(route = ViverScreen.Transition.name) {
-                InitialLogoScreen(navController = navController)
+                InitialLogoScreen(
+                    navController = navController,
+                    isLoggedIn = isLoggedIn
+                )
             }
             composable(route = ViverScreen.StartOrder.name) {
-                StartOrderScreen(navController = navController)
+                StartOrderScreen(
+                    navController = navController,
+                    viewModel = viewModel
+                )
             }
             composable(route = ViverScreen.Login.name) {
-                LoginScreen(onSignUpButtonClicked = {navController.navigate(ViverScreen.SignUp.name)})
+                LoginScreen(
+                    onSignUpButtonClicked = {navController.navigate(ViverScreen.SignUp.name)},
+                    onForgotPasswordButtonClicked = {navController.navigate(ViverScreen.ForgotPassword.name)},
+                    onLoginButtonClicked = {navController.navigate(ViverScreen.Home.name)},
+                    viewModel = viewModel,
+                    context = context
+                )
             }
             composable(route = ViverScreen.SignUp.name) {
                 SignUpScreen(
@@ -308,14 +324,17 @@ fun ViverApp(
                     onBackLoginButtonClicked = {navController.navigate(ViverScreen.Login.name)}
                 )
             }
-//                    composable(route = ViverScreen.Home.name) {
-//                        HomeScreen(navController = navController)
-//                    }
+            composable(route = ViverScreen.ForgotPassword.name) {
+                ForgotPasswordScreen(
+                    onOkButtonClicked = {navController.navigate(ViverScreen.Login.name)},
+                    emailContact = "jhonnathan.rodrigues@aluno.uepb.edu.br"
+                )
+            }
+            composable(route = ViverScreen.Home.name) {
+                HomeScreen()
+            }
 //                    composable(route = ViverScreen.Profile.name) {
 //                        ProfileScreen(navController = navController)
-//                    }
-//                    composable(route = ViverScreen.ForgotPassword.name) {
-//                        ForgotPasswordScreen(navController = navController)
 //                    }
 //                    composable(route = ViverScreen.ValidateEmail.name) {
 //                        ValidateEmailScreen(navController = navController)

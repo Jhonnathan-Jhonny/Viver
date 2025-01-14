@@ -39,7 +39,8 @@ fun TextBox(
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    onNext: (() -> Unit)? = null // Callback para avançar ao próximo campo
+    onNext: (() -> Unit)? = null, // Callback para avançar ao próximo campo
+    errorMessage: Boolean? = null
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -60,7 +61,7 @@ fun TextBox(
         colors = TextFieldDefaults.outlinedTextFieldColors(
             cursorColor = colorResource(id = R.color.Third),
             focusedBorderColor = colorResource(id = R.color.Third),
-            unfocusedBorderColor = colorResource(id = R.color.Third),
+            unfocusedBorderColor = if (errorMessage == true) Color.Red else colorResource(id = R.color.Third),
         ),
         modifier = Modifier
             .fillMaxWidth()
@@ -119,7 +120,8 @@ fun SingleButton(
 @Preview(showBackground = true)
 @Composable
 fun Preview() {
-    SingleButton(onClick = { /*TODO*/ }, isLoading = true, buttonName = "Login", colorResource(id = R.color.First), colorResource(id = R.color.First))
+    TextBox(value = "", onValueChange = {}, label = "Email")
+//    SingleButton(onClick = { /*TODO*/ }, isLoading = true, buttonName = "Login", colorResource(id = R.color.First), colorResource(id = R.color.First))
 }
 
 

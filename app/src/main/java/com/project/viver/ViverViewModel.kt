@@ -19,30 +19,31 @@ class ViverViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<UserState>(UserState.Loading)
     val uiState: StateFlow<UserState> = _uiState
 
-    fun signUpUser(context: Context, user: OrderUiStateUser) {
-        viewModelScope.launch {
-            try {
-                val response = supabase.auth.signUpWith(Email) {
-                    email = user.email
-                    password = user.password
-                }
-                supabase
-                    .from("users")
-                    .insert(
-                        mapOf(
-                            "idAuth" to "response.id",
-                            "name" to user.name,
-                            "surname" to user.surname,
-                            "sex" to user.sex
-                        )
-                    )
-                _uiState.value = UserState.Success("User registered successfully")
-                saveToken(context)
-            } catch (e: Exception) {
-                _uiState.value = UserState.Error("Error during registration: ${e.message}")
+    suspend fun signUpUser(context: Context, user: OrderUiStateUser): UserState {
+        return try {
+            val response = supabase.auth.signUpWith(Email) {
+                email = user.email
+                password = user.password
             }
+            supabase
+                .from("users")
+                .insert(
+                    mapOf(
+                        "idAuth" to response?.id,
+                        "name" to user.name,
+                        "surname" to user.surname,
+                        "sex" to user.sex
+                    )
+                )
+            _uiState.value = UserState.Success("User registered successfully")
+            saveToken(context)
+            UserState.Success("User registered successfully")
+        } catch (e: Exception) {
+            _uiState.value = UserState.Error("Error during registration: ${e.message}")
+            UserState.Error("Error during registration: ${e.message}")
         }
     }
+
 
 
     private fun saveToken(context: Context) {
@@ -58,20 +59,40 @@ class ViverViewModel : ViewModel() {
         return sharedPref.getStringData("accessToken")
     }
 
-    fun logInUser(context: Context, email: String, password: String) {
+    fun checkIfUserLoggedIn(context: Context): Boolean {
+        val token = getToken(context)
+        return !token.isNullOrEmpty()
+    }
+
+    fun refreshTokenIfNeeded() {
         viewModelScope.launch {
+            _uiState.value = UserState.Loading
             try {
-                supabase.auth.signInWith(Email) {
-                    this.email = email
-                    this.password = password
-                }
-                saveToken(context)
-                _uiState.value = UserState.Success("Logged in user successfully")
+                // Simule o processo de refresh do token
+                supabase.auth.refreshCurrentSession()
+                _uiState.value = UserState.Success("Token refreshed successfully")
             } catch (e: Exception) {
-                _uiState.value = UserState.Error("Error during login: ${e.message}")
+                _uiState.value = UserState.Error("Unknown error")
             }
         }
     }
+
+    suspend fun logInUser(context: Context, email: String, password: String): UserState {
+        return try {
+            supabase.auth.signInWith(Email) {
+                this.email = email
+                this.password = password
+            }
+            _uiState.value = UserState.Success("Logged in user successfully")
+            saveToken(context)
+            UserState.Success("Logged in user successfully")
+        } catch (e: Exception) {
+            _uiState.value = UserState.Error("Error during login: ${e.message}")
+            UserState.Error("Usuário inexistente ou email ou senha incorreta")
+        }
+    }
+
+
 
     fun logOutUser(context: Context) {
         viewModelScope.launch {
