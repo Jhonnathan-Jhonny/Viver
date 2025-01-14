@@ -14,12 +14,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class ViverViewModel : ViewModel() {
+open class ViverViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow<UserState>(UserState.Loading)
     val uiState: StateFlow<UserState> = _uiState
 
-    suspend fun signUpUser(context: Context, user: OrderUiStateUser): UserState {
+    open suspend fun signUpUser(context: Context, user: OrderUiStateUser): UserState {
         return try {
             val response = supabase.auth.signUpWith(Email) {
                 email = user.email

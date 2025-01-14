@@ -3,7 +3,6 @@ package com.project.viver.ui
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,8 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -37,8 +34,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -68,7 +63,6 @@ fun LoginScreen(
     val password = remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
 
-    var passwordVisible by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
     var isLoading by remember { mutableStateOf(false) }
 
@@ -140,16 +134,6 @@ fun LoginScreen(
                             contentDescription = "Senha Icon"
                         )
                     },
-                    trailingIcon = {
-                        Icon(
-                            imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                            contentDescription = null,
-                            modifier = Modifier.clickable {
-                                passwordVisible = !passwordVisible
-                            }
-                        )
-                    },
-                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     onNext = { focusManager.clearFocus() },
                     errorMessage = !isValid
                 )
