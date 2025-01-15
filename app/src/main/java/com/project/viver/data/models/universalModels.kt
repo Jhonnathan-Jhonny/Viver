@@ -65,15 +65,22 @@ fun TextBox(
         },
         leadingIcon = { leadingIcon?.invoke() },
         trailingIcon = {
-            Icon(
-                imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                contentDescription = "Toggle Password Visibility",
-                modifier = Modifier.clickable {
-                    passwordVisible = !passwordVisible
-                }
-            )
+            if (label == "Senha" || label == "Confirmar Senha"){
+                Icon(
+                    imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                    contentDescription = "Toggle Password Visibility",
+                    modifier = Modifier.clickable {
+                        passwordVisible = !passwordVisible
+                    }
+                )
+            }
+
         },
-        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+        visualTransformation = if (label == "Senha" || label == "Confirmar Senha") {
+            if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation()
+        }else{
+            VisualTransformation.None
+        },
         shape = RoundedCornerShape(16.dp),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             cursorColor = colorResource(id = R.color.Third),

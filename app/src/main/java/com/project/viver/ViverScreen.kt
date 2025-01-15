@@ -187,7 +187,7 @@ fun ViverAppTopBar2(
                         onClick = { /* TODO: Ação ao clicar */ },
                         modifier = Modifier
                             .size(width = 66.dp, height = 51.dp)
-                            .padding(end = 16.dp),
+                            .padding(start = 16.dp),
                         shape = CircleShape,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0x40111111),
@@ -206,24 +206,22 @@ fun ViverAppTopBar2(
             }
         },
         navigationIcon = {
-            if (canNavigateBack) {
-                Button(
-                    onClick = { navigateUp() },
-                    modifier = Modifier
-                        .size(width = 50.dp, height = 50.dp),
-                    shape = CircleShape,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0x40111111),
-                        contentColor = Color.White
-                    ),
-                    contentPadding = PaddingValues(0.dp),
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.back),
-                        contentDescription = stringResource(R.string.voltar_para_tela_anterior),
-                        modifier = Modifier.size(30.dp)
-                    )
-                }
+            Button(
+                onClick = { navigateUp() },
+                modifier = Modifier
+                    .size(width = 50.dp, height = 50.dp),
+                shape = CircleShape,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0x40111111),
+                    contentColor = Color.White
+                ),
+                contentPadding = PaddingValues(0.dp),
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.back),
+                    contentDescription = stringResource(R.string.voltar_para_tela_anterior),
+                    modifier = Modifier.size(30.dp)
+                )
             }
         }
     )
@@ -331,7 +329,10 @@ fun ViverApp(
                 )
             }
             composable(route = ViverScreen.Home.name) {
-                HomeScreen()
+                HomeScreen(
+                    onNewListButtonClicked = {navController.navigate(ViverScreen.NewList.name)},
+                    onListsButtonClicked = {navController.navigate(ViverScreen.Lists.name)}
+                )
             }
 //                    composable(route = ViverScreen.Profile.name) {
 //                        ProfileScreen(navController = navController)
