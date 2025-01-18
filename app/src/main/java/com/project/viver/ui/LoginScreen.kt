@@ -77,12 +77,14 @@ fun LoginScreen(
         isValid = true
         if (email.value.isBlank()) {
             isValid = false
+            emailError = "E-mail não pode estar vazio"
         } else {
             emailError = ""
         }
 
         if (password.value.isBlank()) {
             isValid = false
+            passwordError = "Senha não pode estar vazia"
         } else {
             passwordError = ""
         }
@@ -192,7 +194,6 @@ fun LoginScreen(
             }
         }
     )
-
 }
 
 @Preview(showBackground = true)
