@@ -121,8 +121,15 @@ fun LoginScreen(
                         )
                     },
                     onNext = { focusManager.moveFocus(FocusDirection.Down) },
-                    errorMessage = !isValid
+                    errorMessage = emailError.isNotEmpty()
                 )
+                if (emailError.isNotEmpty()) {
+                    Text(
+                        text = emailError,
+                        color = Color.Red,
+                        fontSize = 12.sp
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(32.dp))
 
@@ -137,8 +144,15 @@ fun LoginScreen(
                         )
                     },
                     onNext = { focusManager.clearFocus() },
-                    errorMessage = !isValid
+                    errorMessage = passwordError.isNotEmpty()
                 )
+                if (passwordError.isNotEmpty()) {
+                    Text(
+                        text = passwordError,
+                        color = Color.Red,
+                        fontSize = 12.sp
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(8.dp))
 

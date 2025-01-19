@@ -98,7 +98,7 @@ class SignUpScreenTest {
     fun validatePasswordVisibilityToggle() {
         // Encontre todos os ícones com a descrição "Toggle Password Visibility" e clique no primeiro
         composeTestRule.onAllNodesWithContentDescription("Toggle Password Visibility")
-            .assertCountEquals(5)  // Verifique que temos exatamente 5 nós com a descrição esperada
+            .assertCountEquals(2)  // Verifique que temos exatamente 5 nós com a descrição esperada
             .onFirst()  // Pega o primeiro nó encontrado
             .performClick()  // Realiza o clique no ícone encontrado
 

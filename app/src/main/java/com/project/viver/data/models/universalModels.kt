@@ -31,6 +31,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -129,7 +130,10 @@ fun SingleButton(
         colors = ButtonDefaults.buttonColors(Color.Transparent)
     ) {
         if (isLoading) {
-            CircularProgressIndicator(color = colorText)
+            CircularProgressIndicator(
+                color = colorText,
+                modifier = Modifier.testTag("progress_indicator")
+            )
         } else {
             Text(
                 text = buttonName,

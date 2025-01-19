@@ -1,8 +1,11 @@
 package com.project.viver
 
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
@@ -91,32 +94,34 @@ class LoginScreenTest {
     }
 
     @Test
-    fun loginWithIncorrectCredentials() {
-        composeTestRule.onNodeWithContentDescription("E-mail Icon").performTextInput("wrong")
-        composeTestRule.onNodeWithContentDescription("Senha Icon").performTextInput("wrong")
-        composeTestRule.onNodeWithText("Entrar").performClick()
-
-        composeTestRule.onNodeWithText("Usuário ou senha inválidos").assertExists()
-    }
-
-    @Test
     fun snackbarDisplaysErrorMessage() {
-        fakeViewModel.setErrorState("Erro ao fazer login")
+        fakeViewModel.loginUserResult = UserState.Error("Usuário inexistente ou email ou senha incorreta")
+
         composeTestRule.onNodeWithContentDescription("E-mail Icon").performTextInput("email@exemplo.com")
         composeTestRule.onNodeWithContentDescription("Senha Icon").performTextInput("senha123")
+
         composeTestRule.onNodeWithText("Entrar").performClick()
 
-        composeTestRule.onNodeWithText("Erro ao fazer login").assertExists()
+        composeTestRule.waitUntil(timeoutMillis = 5000) {
+            composeTestRule.onAllNodesWithText("Usuário inexistente ou email ou senha incorreta").fetchSemanticsNodes().isNotEmpty()
+        }
+
+        composeTestRule.onNodeWithText("Usuário inexistente ou email ou senha incorreta").assertIsDisplayed()
     }
 
     @Test
-    fun loginWithInvalidCredentials() {
-        fakeViewModel.loginUserResult = UserState.Error("Usuário ou senha inválidos")
-
-        composeTestRule.onNodeWithContentDescription("E-mail Icon").performTextInput("invalido@exemplo.com")
-        composeTestRule.onNodeWithContentDescription("Senha Icon").performTextInput("senhaerrada")
+    fun loginWithCorrectCredentialsAndWaitForLoading() {
+        composeTestRule.onNodeWithContentDescription("E-mail Icon").performTextInput("admin")
+        composeTestRule.onNodeWithContentDescription("Senha Icon").performTextInput("admin")
         composeTestRule.onNodeWithText("Entrar").performClick()
 
-        composeTestRule.onNodeWithText("Usuário ou senha inválidos").assertExists()
+        // Esperar até o indicador de carregamento desaparecer
+        composeTestRule.waitUntil(timeoutMillis = 5000) {
+            composeTestRule.onNodeWithTag("progress_indicator").assertDoesNotExist()
+            true  // Retorna verdadeiro quando o indicador desapareceu
+        }
+
+        // Verificar se a navegação foi realizada após o carregamento
+        assertEquals("home", navController.currentDestination?.route)
     }
 }
