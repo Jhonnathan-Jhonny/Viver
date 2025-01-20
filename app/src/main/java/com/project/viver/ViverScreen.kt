@@ -44,6 +44,7 @@ import com.project.viver.ui.ForgotPasswordScreen
 import com.project.viver.ui.HomeScreen
 import com.project.viver.ui.InitialLogoScreen
 import com.project.viver.ui.LoginScreen
+import com.project.viver.ui.ProfileScreen
 import com.project.viver.ui.SignUpScreen
 import com.project.viver.ui.StartOrderScreen
 
@@ -159,6 +160,7 @@ fun ViverAppTopBar2(
     currentScreen: ViverScreen,
     canNavigateBack: Boolean,
     navigateUp: () -> Unit,
+    navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
     val shouldShowTopBar = currentScreen == ViverScreen.Home
@@ -184,7 +186,7 @@ fun ViverAppTopBar2(
                 // Botão da direita
                 if (shouldShowTopBar) {
                     Button(
-                        onClick = { /* TODO: Ação ao clicar */ },
+                        onClick = { navController.navigate(ViverScreen.Profile.name) },
                         modifier = Modifier
                             .size(width = 66.dp, height = 51.dp)
                             .padding(start = 16.dp),
@@ -273,7 +275,8 @@ fun ViverApp(
                     ViverAppTopBar2(
                         currentScreen = currentScreen,
                         canNavigateBack = canNavigateBack,
-                        navigateUp = { navController.navigateUp() }
+                        navigateUp = { navController.navigateUp() },
+                        navController = navController
                     )
                 }
 
@@ -331,12 +334,15 @@ fun ViverApp(
             composable(route = ViverScreen.Home.name) {
                 HomeScreen(
                     onNewListButtonClicked = {navController.navigate(ViverScreen.NewList.name)},
-                    onListsButtonClicked = {navController.navigate(ViverScreen.Lists.name)}
+                    onListsButtonClicked = {navController.navigate(ViverScreen.Lists.name)},
+                    onProfileButtonClicked = {navController.navigate(ViverScreen.Profile.name)}
                 )
             }
-//                    composable(route = ViverScreen.Profile.name) {
-//                        ProfileScreen(navController = navController)
-//                    }
+            composable(route = ViverScreen.Profile.name) {
+                ProfileScreen(
+                    viewModel = viewModel,
+                )
+            }
 //                    composable(route = ViverScreen.ValidateEmail.name) {
 //                        ValidateEmailScreen(navController = navController)
 //                    }

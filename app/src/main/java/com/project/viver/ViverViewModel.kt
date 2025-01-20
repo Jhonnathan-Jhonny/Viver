@@ -1,5 +1,7 @@
 package com.project.viver
 import android.content.Context
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.viver.data.models.OrderUiStateUser
@@ -18,6 +20,9 @@ open class ViverViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow<UserState>(UserState.Loading)
     val uiState: StateFlow<UserState> = _uiState
+
+    private val _userProfile = MutableLiveData<OrderUiStateUser>()
+    val userProfile: LiveData<OrderUiStateUser> = _userProfile
 
     open suspend fun signUpUser(context: Context, user: OrderUiStateUser): UserState {
         return try {
@@ -124,5 +129,20 @@ open class ViverViewModel : ViewModel() {
                 _uiState.value = UserState.Error(e.error)
             }
         }
+    }
+
+    fun fetchUserProfile() {
+        // Simulando dados. Substitua por lógica real, como uma chamada de API.
+        _userProfile.value = OrderUiStateUser(
+            name = "Cardamon",
+            surname = "Violet",
+            email = "loremipsumyosumokatrunea@email.com",
+            sex = "Masculino",
+            restrictions =
+                "Quisque ornare eget augue vel consequat."+
+                "Nulla lorem risus, elementum eget."+
+                "cdsnvjsdn"+
+                "jfnskdjfksjd"
+        )
     }
 }
