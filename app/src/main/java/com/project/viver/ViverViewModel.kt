@@ -12,6 +12,7 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -23,33 +24,6 @@ open class ViverViewModel : ViewModel() {
 
     private val _userProfile = MutableLiveData<OrderUiStateUser>()
     val userProfile: LiveData<OrderUiStateUser> = _userProfile
-
-    open suspend fun signUpUser(context: Context, user: OrderUiStateUser): UserState {
-        return try {
-            val response = supabase.auth.signUpWith(Email) {
-                email = user.email
-                password = user.password
-            }
-            supabase
-                .from("users")
-                .insert(
-                    mapOf(
-                        "idAuth" to response?.id,
-                        "name" to user.name,
-                        "surname" to user.surname,
-                        "sex" to user.sex
-                    )
-                )
-            _uiState.value = UserState.Success("User registered successfully")
-            saveToken(context)
-            UserState.Success("User registered successfully")
-        } catch (e: Exception) {
-            _uiState.value = UserState.Error("Error during registration: ${e.message}")
-            UserState.Error("Error during registration: ${e.message}")
-        }
-    }
-
-
 
     private fun saveToken(context: Context) {
         viewModelScope.launch {
@@ -64,11 +38,6 @@ open class ViverViewModel : ViewModel() {
         return sharedPref.getStringData("accessToken")
     }
 
-    fun checkIfUserLoggedIn(context: Context): Boolean {
-        val token = getToken(context)
-        return !token.isNullOrEmpty()
-    }
-
     fun refreshTokenIfNeeded() {
         viewModelScope.launch {
             _uiState.value = UserState.Loading
@@ -80,6 +49,78 @@ open class ViverViewModel : ViewModel() {
                 _uiState.value = UserState.Error("Unknown error")
             }
         }
+    }
+
+    fun fetchUserProfile(context: Context) {
+        viewModelScope.launch {
+            _uiState.value = UserState.Loading
+            try {
+                val token = getToken(context)
+                if (token.isNullOrEmpty()) {
+                    _uiState.value = UserState.Error("Token não encontrado.")
+                    return@launch
+                }
+
+                val userId = supabase.auth.retrieveUser(token).id
+                val response = supabase
+                    .from("users")
+                    .select(columns = Columns.list("name, surname, sex, restrictions")) {
+                        filter {
+                            eq("idAuth", userId)
+                        }
+                    }
+                    .decodeSingle<OrderUiStateUser>()
+
+                _userProfile.value = response
+
+                _uiState.value = UserState.Success("Perfil do usuário carregado com sucesso.")
+            } catch (e: Exception) {
+                _uiState.value = UserState.Error("Erro ao buscar perfil: ${e.message ?: "Erro desconhecido"}")
+            }
+        }
+    }
+
+    open suspend fun signUpUser(context: Context, user: OrderUiStateUser): UserState {
+        return try {
+            // Registrar o usuário
+            val response = supabase.auth.signUpWith(Email) {
+                email = user.email
+                password = user.password
+            }
+
+            // Recuperar o ID do usuário
+            val userId = response?.id ?: supabase.auth.currentSessionOrNull()?.user?.id
+
+            if (userId == null) {
+                _uiState.value = UserState.Error("Failed to retrieve user ID after signup")
+                throw Exception("Failed to retrieve user ID after signup")
+            }
+
+            // Inserir no banco de dados
+            supabase
+                .from("users")
+                .insert(
+                    mapOf(
+                        "idAuth" to userId,
+                        "name" to user.name,
+                        "surname" to user.surname,
+                        "sex" to user.sex
+                    )
+                )
+
+            _uiState.value = UserState.Success("User registered successfully")
+            saveToken(context)
+            UserState.Success("User registered successfully")
+        } catch (e: Exception) {
+            _uiState.value = UserState.Error("Error during registration: ${e.message}")
+            UserState.Error("Error during registration: ${e.message}")
+        }
+    }
+
+
+    fun checkIfUserLoggedIn(context: Context): Boolean {
+        val token = getToken(context)
+        return !token.isNullOrEmpty()
     }
 
     suspend fun logInUser(context: Context, email: String, password: String): UserState {
@@ -96,8 +137,6 @@ open class ViverViewModel : ViewModel() {
             UserState.Error("Usuário inexistente ou email ou senha incorreta")
         }
     }
-
-
 
     fun logOutUser(context: Context) {
         viewModelScope.launch {
@@ -129,20 +168,5 @@ open class ViverViewModel : ViewModel() {
                 _uiState.value = UserState.Error(e.error)
             }
         }
-    }
-
-    fun fetchUserProfile() {
-        // Simulando dados. Substitua por lógica real, como uma chamada de API.
-        _userProfile.value = OrderUiStateUser(
-            name = "Cardamon",
-            surname = "Violet",
-            email = "loremipsumyosumokatrunea@email.com",
-            sex = "Masculino",
-            restrictions =
-                "Quisque ornare eget augue vel consequat."+
-                "Nulla lorem risus, elementum eget."+
-                "cdsnvjsdn"+
-                "jfnskdjfksjd"
-        )
     }
 }

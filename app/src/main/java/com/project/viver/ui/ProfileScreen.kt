@@ -1,8 +1,7 @@
-@file:Suppress("UNUSED_EXPRESSION")
-
 package com.project.viver.ui
 
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -19,16 +18,19 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -38,17 +40,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.project.viver.R
 import com.project.viver.ViverViewModel
+import com.project.viver.data.models.OrderUiStateUser
+import com.project.viver.data.models.UserState
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ProfileScreen(
-    viewModel: ViverViewModel
+    viewModel: ViverViewModel,
+    context: Context
 ) {
     val userProfile by viewModel.userProfile.observeAsState()
+    val userState by viewModel.uiState.collectAsState()
 
     // Busca os dados do usuário
-    LaunchedEffect(Unit) {
-        viewModel.fetchUserProfile()
+    LaunchedEffect(key1 = Unit) {
+        viewModel.fetchUserProfile(context)
     }
 
     Box(
@@ -56,6 +62,45 @@ fun ProfileScreen(
             .fillMaxSize()
             .background(colorResource(id = R.color.First))
     ) {
+        when (userState) {
+            is UserState.Loading -> {
+                // Indicador de carregamento
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = Color.White)
+                }
+            }
+            is UserState.Error -> {
+                // Exibe mensagem de erro
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = (userState as UserState.Error).message,
+                        color = Color.White,
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+            is UserState.Success -> {
+                ProfileContent(userProfile = userProfile, context = context)
+            }
+        }
+    }
+}
+
+@Composable
+fun ProfileContent(userProfile: OrderUiStateUser?, context: Context) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colorResource(id = R.color.First))
+    ) {
+        // Topo da tela com avatar
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -90,7 +135,7 @@ fun ProfileScreen(
                     )
                 )
                 .background(Color.White)
-                .padding(top = 95.dp) // Ajuste para evitar sobreposição com a imagem
+                .padding(top = 95.dp)
         ) {
             // Nome do usuário
             Text(
@@ -131,13 +176,13 @@ fun ProfileScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 16.dp)
             ) {
-                ProfileInfoRow(label = "Nome", value = userProfile?.name ?: "")
-                ProfileInfoRow(label = "Sobrenome", value = userProfile?.surname ?: "")
-                ProfileInfoRow(label = "E-mail", value = userProfile?.email ?: "")
-                ProfileInfoRow(label = "Sexo", value = userProfile?.sex ?: "")
+                ProfileInfoRow(label = "Nome", value = userProfile?.name ?: "Não informado")
+                ProfileInfoRow(label = "Sobrenome", value = userProfile?.surname ?: "Não informado")
+                ProfileInfoRow(label = "E-mail", value = userProfile?.email ?: "Não informado")
+                ProfileInfoRow(label = "Sexo", value = userProfile?.sex ?: "Não informado")
                 ProfileInfoRow(
                     label = "Restrições alimentares",
-                    value = userProfile?.restrictions ?: ""
+                    value = userProfile?.restrictions ?: "Não informado"
                 )
             }
 
@@ -156,8 +201,6 @@ fun ProfileScreen(
         }
     }
 }
-
-
 
 @Composable
 fun ProfileInfoRow(label: String, value: String) {
@@ -181,8 +224,9 @@ fun ProfileInfoRow(label: String, value: String) {
     }
 }
 
+
 @Preview(showBackground = true)
 @Composable
 fun ProfileScreenPreview() {
-    ProfileScreen(ViverViewModel())
+    ProfileScreen(ViverViewModel(), LocalContext.current)
 }

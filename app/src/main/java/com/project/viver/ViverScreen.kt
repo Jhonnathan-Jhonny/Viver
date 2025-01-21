@@ -341,6 +341,7 @@ fun ViverApp(
             composable(route = ViverScreen.Profile.name) {
                 ProfileScreen(
                     viewModel = viewModel,
+                    context
                 )
             }
 //                    composable(route = ViverScreen.ValidateEmail.name) {

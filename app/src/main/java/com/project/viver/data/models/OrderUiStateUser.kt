@@ -5,12 +5,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class OrderUiStateUser (
     val idAuth: String = "",
-    val name: String = "",
-    val surname: String = "",
+    val name: String? = "",
+    val surname: String? = "",
     val email: String = "",
     val password: String = "",
-    val sex: String = "",
-    val restrictions: String = "",
-    val weight: Int = 0,
-    val physicalActivityLevel: Int = 0,
+    val sex: String? = "",
+    val restrictions: String? = "",
+    val weight: Int? = 0,
+    val physicalActivityLevel: Int? = 0,
 )
