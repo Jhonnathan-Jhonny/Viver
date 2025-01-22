@@ -19,4 +19,6 @@
     <string name="entrar">Entrar</string>
     <string name="cadastre_se">Cadastre-se</string>
     <string name="nova_lista">Nova lista</string>
+    <string name="logout">Logout</string>
+    <string name="restri_es_alimentares">Restrições alimentares</string>
 </resources>

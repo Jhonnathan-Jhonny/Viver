@@ -142,12 +142,15 @@ open class ViverViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 supabase.auth.signOut()
+                val sharedPref = SharedPreferenceHelper(context)
+                sharedPref.saveStringData("accessToken", "")
                 _uiState.value = UserState.Success("Logged out user successfully")
             } catch (e: Exception) {
                 _uiState.value = UserState.Error("Error during logout: ${e.message}")
             }
         }
     }
+
 
     fun isUserLoggedIn(
         context: Context,
@@ -169,4 +172,39 @@ open class ViverViewModel : ViewModel() {
             }
         }
     }
+
+    fun updateUserProfile(user: OrderUiStateUser, context: Context) {
+        viewModelScope.launch {
+            try {
+                _uiState.value = UserState.Loading
+                val token = getToken(context)
+                if (token.isNullOrEmpty()) {
+                    _uiState.value = UserState.Error("Token não encontrado.")
+                    return@launch
+                }
+
+                val userId = supabase.auth.retrieveUser(token).id
+
+                // Atualizar no banco de dados
+                val response = supabase
+                    .from("users")
+                    .update(
+                        mapOf(
+                            "name" to user.name,
+                            "surname" to user.surname,
+                            "sex" to user.sex
+                        )
+                    ){
+                        filter {
+                            eq("idAuth", userId)
+                        }
+                    }
+
+                _uiState.value = UserState.Success("Perfil atualizado com sucesso.")
+            } catch (e: Exception) {
+                _uiState.value = UserState.Error("Erro ao atualizar perfil: ${e.message ?: "Erro desconhecido"}")
+            }
+        }
+    }
+
 }

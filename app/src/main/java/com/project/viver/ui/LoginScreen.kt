@@ -48,8 +48,6 @@ import com.project.viver.data.models.TextBox
 import com.project.viver.data.models.UserState
 import kotlinx.coroutines.launch
 
-//Tratar erros de email ou senha errada
-
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun LoginScreen(

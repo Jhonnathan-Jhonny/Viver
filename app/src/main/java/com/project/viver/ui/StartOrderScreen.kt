@@ -1,6 +1,7 @@
 package com.project.viver.ui
 
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -30,18 +31,29 @@ import androidx.navigation.compose.rememberNavController
 import com.project.viver.R
 import com.project.viver.ViverScreen
 import com.project.viver.ViverViewModel
-import com.project.viver.data.models.UserState
 import kotlinx.coroutines.delay
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun StartOrderScreen(
     navController: NavHostController,
+    context: Context,
     viewModel: ViverViewModel
 ) {
-    // Atraso de 4 segundos para exibir a tela de boas-vindas
+    // Verificar o token assim que a tela é carregada
     LaunchedEffect(key1 = true) {
-        delay(4000) // Espera por 4 segundos
+        delay(4000) // Espera 4 segundos para a tela de boas-vindas ser exibida
+        if (viewModel.checkIfUserLoggedIn(context)) {
+            // Se o token estiver presente, navega para a tela inicial
+            navController.navigate(ViverScreen.Home.name) {
+                popUpTo(ViverScreen.StartOrder.name) { inclusive = true }
+            }
+        } else {
+            // Se o token não estiver presente, vai para a tela de login
+            navController.navigate(ViverScreen.Login.name) {
+                popUpTo(ViverScreen.StartOrder.name) { inclusive = true }
+            }
+        }
     }
 
     Column(
@@ -124,32 +136,6 @@ fun StartOrderScreen(
             )
         }
     }
-
-    // Navegação para tela seguinte, com base no estado do token
-    LaunchedEffect(key1 = viewModel.uiState.value) {
-        when (val state = viewModel.uiState.value) {
-            is UserState.Loading -> {
-                // O loading pode ser tratado se necessário
-            }
-            is UserState.Error -> {
-                val errorMessage = (state as? UserState.Error)?.message ?: "Unknown error"
-                navController.navigate(ViverScreen.Login.name) {
-                    popUpTo(ViverScreen.StartOrder.name) { inclusive = true }
-                }
-            }
-            is UserState.Success -> {
-                delay(4000) // Espera mais 4 segundos para garantir tempo suficiente
-                navController.navigate(ViverScreen.Login.name) {
-                    popUpTo(ViverScreen.StartOrder.name) { inclusive = true }
-                }
-            }
-        }
-    }
-
-    // Adicionando um atraso fixo para garantir que a tela de boas-vindas seja visível
-    LaunchedEffect(key1 = true) {
-        delay(4000) // Isso garante que a tela será visível por 4 segundos
-    }
 }
 
 
@@ -161,6 +147,7 @@ fun StartOrderScreenPreview() {
     val viewModel = ViverViewModel()
     StartOrderScreen(
         navController = navController,
+        context = navController.context,
         viewModel
     )
 }

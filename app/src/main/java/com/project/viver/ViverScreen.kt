@@ -2,6 +2,7 @@
 
 package com.project.viver
 
+import android.content.Context
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -40,6 +41,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.project.viver.ui.ConfirmPasswordScreen
 import com.project.viver.ui.ForgotPasswordScreen
 import com.project.viver.ui.HomeScreen
 import com.project.viver.ui.InitialLogoScreen
@@ -158,6 +160,8 @@ fun ViverAppTopBar1(
 @Composable
 fun ViverAppTopBar2(
     currentScreen: ViverScreen,
+    viewModel: ViverViewModel,
+    context: Context,
     canNavigateBack: Boolean,
     navigateUp: () -> Unit,
     navController: NavHostController,
@@ -209,7 +213,18 @@ fun ViverAppTopBar2(
         },
         navigationIcon = {
             Button(
-                onClick = { navigateUp() },
+                onClick = {
+                    if (currentScreen == ViverScreen.Home) {
+                        viewModel.logOutUser(context = context)
+                        // Após fazer logout, navega para o login
+                        navController.navigate(ViverScreen.Login.name) {
+                            popUpTo(ViverScreen.Home.name) { inclusive = true }
+                        }
+                    } else {
+                        // Volta para a tela anterior
+                        navController.navigateUp()
+                    }
+                },
                 modifier = Modifier
                     .size(width = 50.dp, height = 50.dp),
                 shape = CircleShape,
@@ -220,8 +235,16 @@ fun ViverAppTopBar2(
                 contentPadding = PaddingValues(0.dp),
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.back),
-                    contentDescription = stringResource(R.string.voltar_para_tela_anterior),
+                    painter = if (currentScreen == ViverScreen.Home) {
+                        painterResource(id = R.drawable.logout)
+                    } else {
+                        painterResource(id = R.drawable.back)
+                    },
+                    contentDescription = if (currentScreen == ViverScreen.Home) {
+                        stringResource(R.string.logout)
+                    } else {
+                        stringResource(R.string.voltar_para_tela_anterior)
+                    },
                     modifier = Modifier.size(30.dp)
                 )
             }
@@ -275,6 +298,8 @@ fun ViverApp(
                     ViverAppTopBar2(
                         currentScreen = currentScreen,
                         canNavigateBack = canNavigateBack,
+                        viewModel = viewModel,
+                        context = context,
                         navigateUp = { navController.navigateUp() },
                         navController = navController
                     )
@@ -301,6 +326,7 @@ fun ViverApp(
             composable(route = ViverScreen.StartOrder.name) {
                 StartOrderScreen(
                     navController = navController,
+                    context = context,
                     viewModel = viewModel
                 )
             }
@@ -341,8 +367,12 @@ fun ViverApp(
             composable(route = ViverScreen.Profile.name) {
                 ProfileScreen(
                     viewModel = viewModel,
-                    context
+                    onEditPasswordButtonClicked = {navController.navigate(ViverScreen.ConfirmPassword.name)},
+                    context = context
                 )
+            }
+            composable(route = ViverScreen.ConfirmPassword.name) {
+                ConfirmPasswordScreen()
             }
 //                    composable(route = ViverScreen.ValidateEmail.name) {
 //                        ValidateEmailScreen(navController = navController)
@@ -361,9 +391,6 @@ fun ViverApp(
 //                    }
 //                    composable(route = ViverScreen.EditedPasswordSuccessfully.name) {
 //                        EditedPasswordSuccessfullyScreen(navController = navController)
-//                    }
-//                    composable(route = ViverScreen.ConfirmPassword.name) {
-//                        ConfirmPasswordScreen(navController = navController)
 //                    }
 //                    composable(route = ViverScreen.EspecificList.name) {
 //                        EspecificListScreen(navController = navController)
