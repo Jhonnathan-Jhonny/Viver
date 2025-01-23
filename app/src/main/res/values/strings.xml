@@ -21,4 +21,8 @@
     <string name="nova_lista">Nova lista</string>
     <string name="logout">Logout</string>
     <string name="restri_es_alimentares">Restrições alimentares</string>
+    <string name="confirme_sua_senha">Confirme sua senha</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="continuar">Continuar</string>
+    <string name="nova_senha">Nova senha</string>
 </resources>

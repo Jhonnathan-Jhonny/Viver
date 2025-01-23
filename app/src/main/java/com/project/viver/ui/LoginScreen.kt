@@ -191,7 +191,7 @@ fun LoginScreen(
                     isLoading = isLoading,
                     buttonName = stringResource(R.string.entrar),
                     colorButton = colorResource(id = R.color.First),
-                    colorText = Color.White
+                    colorText = Color.White,
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))

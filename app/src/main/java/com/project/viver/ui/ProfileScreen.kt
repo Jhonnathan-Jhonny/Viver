@@ -1,6 +1,5 @@
 package com.project.viver.ui
 
-import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -52,7 +51,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.navigation.compose.rememberNavController
 import com.project.viver.R
 import com.project.viver.ViverScreen
 import com.project.viver.ViverViewModel
@@ -60,7 +61,6 @@ import com.project.viver.data.models.OrderUiStateUser
 import com.project.viver.data.models.TextBox
 import com.project.viver.data.models.UserState
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ProfileScreen(
     viewModel: ViverViewModel,
@@ -74,7 +74,6 @@ fun ProfileScreen(
     LaunchedEffect(key1 = Unit) {
         viewModel.fetchUserProfile(context)
     }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -274,13 +273,22 @@ fun ProfileContent(
             Spacer(modifier = Modifier.weight(1f))
             Button(
                 onClick = { /* Ação de desativar conta */ },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .border(
+                        width = 2.dp,
+                        color = Color.Red,
+                        shape = RoundedCornerShape(12.dp)
+                    ),
                 shape = RoundedCornerShape(50)
             ) {
-                Text(text = "Desativar conta", color = Color.White)
+                Text(
+                    text = "Desativar conta",
+                    color = Color.Red,
+                    fontSize = 15.sp
+                )
             }
         }
     }
@@ -494,10 +502,11 @@ fun GenderRadioButton(
 @Preview(showBackground = true)
 @Composable
 fun ProfileScreenPreview() {
+    val navController = rememberNavController()
     ProfileContent(
         userProfile = OrderUiStateUser(name = "Jhonnathan",
         surname = "Rodrigues", sex = "M"),
         context = LocalContext.current,
-        onEditPasswordButtonClicked = {ViverScreen.ConfirmPassword.name})
-//    ProfileScreen(ViverViewModel(), LocalContext.current)
+        onEditPasswordButtonClicked = { ViverScreen.ConfirmPassword.name})
+//    ProfileScreen(ViverViewModel(),navController.context) { ViverScreen.Profile }
 }

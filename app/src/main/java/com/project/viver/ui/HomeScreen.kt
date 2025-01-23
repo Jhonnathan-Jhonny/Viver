@@ -23,14 +23,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.project.viver.R
-import com.project.viver.ViverScreen
+import com.project.viver.ViverViewModel
 import com.project.viver.data.models.SingleButton
 
 @Composable
 fun HomeScreen(
+    viewModel: ViverViewModel,
     onNewListButtonClicked: () -> Unit,
     onListsButtonClicked: () -> Unit,
     onProfileButtonClicked: () -> Unit
+
 ) {
 
     val isLoading by remember { mutableStateOf(false) }
@@ -82,8 +84,10 @@ fun HomeScreen(
 @Composable
 fun HomeScreenPreview() {
     val navController = NavController(LocalContext.current)
-    HomeScreen({
-        navController.navigate(ViverScreen.NewList.name) }, {
-        navController.navigate(ViverScreen.Lists.name)
-    }) { navController.navigate(ViverScreen.Profile.name) }
+    val viewModel = ViverViewModel()
+//    HomeScreen({
+//        viewModel = viewModel,
+//        navController.navigate(ViverScreen.NewList.name) }, {
+//        navController.navigate(ViverScreen.Lists.name),
+//    }) { navController.navigate(ViverScreen.Profile.name) }
 }

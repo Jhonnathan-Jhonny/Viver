@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+
 open class ViverViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow<UserState>(UserState.Loading)
@@ -38,19 +39,6 @@ open class ViverViewModel : ViewModel() {
         return sharedPref.getStringData("accessToken")
     }
 
-    fun refreshTokenIfNeeded() {
-        viewModelScope.launch {
-            _uiState.value = UserState.Loading
-            try {
-                // Simule o processo de refresh do token
-                supabase.auth.refreshCurrentSession()
-                _uiState.value = UserState.Success("Token refreshed successfully")
-            } catch (e: Exception) {
-                _uiState.value = UserState.Error("Unknown error")
-            }
-        }
-    }
-
     fun fetchUserProfile(context: Context) {
         viewModelScope.launch {
             _uiState.value = UserState.Loading
@@ -61,21 +49,37 @@ open class ViverViewModel : ViewModel() {
                     return@launch
                 }
 
-                val userId = supabase.auth.retrieveUser(token).id
+                // Recupera o usuário autenticado e seu email
+                val user = supabase.auth.retrieveUser(token)
+                val email = user?.email
+
+                if (email == null) {
+                    _uiState.value = UserState.Error("Email não encontrado.")
+                    return@launch
+                }
+
+                // Obtém o userId
+                val userId = user.id
+
+                // Consulta o perfil do usuário na tabela 'users'
                 val response = supabase
                     .from("users")
-                    .select(columns = Columns.list("name, surname, sex, restrictions")) {
+                    .select(columns = Columns.list("name, surname, sex, restrictions")){
                         filter {
                             eq("idAuth", userId)
                         }
                     }
-                    .decodeSingle<OrderUiStateUser>()
+                    .decodeSingleOrNull<OrderUiStateUser>()
 
-                _userProfile.value = response
+                // Agora, adicione o email à resposta
+                if (response != null) {
+                    _userProfile.value = response.copy(email = email)
+                }
 
                 _uiState.value = UserState.Success("Perfil do usuário carregado com sucesso.")
             } catch (e: Exception) {
-                _uiState.value = UserState.Error("Erro ao buscar perfil: ${e.message ?: "Erro desconhecido"}")
+                _uiState.value =
+                    UserState.Error("Erro ao buscar perfil: ${e.message ?: "Erro desconhecido"}")
             }
         }
     }
@@ -151,7 +155,6 @@ open class ViverViewModel : ViewModel() {
         }
     }
 
-
     fun isUserLoggedIn(
         context: Context,
     ) {
@@ -206,5 +209,23 @@ open class ViverViewModel : ViewModel() {
             }
         }
     }
+
+    fun confirmPassword(email: String, currentPassword: String) {
+        viewModelScope.launch {
+            _uiState.value = UserState.Loading
+            try {
+                // Tenta fazer login com email e senha
+                val result = supabase.auth.signInWith(Email) {
+                    this.email = email
+                    this.password = currentPassword
+                }
+                _uiState.value = UserState.Success("Senha confirmada.")
+            } catch (e: Exception) {
+                // Caso ocorra algum erro durante o processo de autenticação
+                _uiState.value = UserState.Error("Senha icorreta")
+            }
+        }
+    }
+
 
 }

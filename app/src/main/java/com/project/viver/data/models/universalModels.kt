@@ -3,6 +3,7 @@ package com.project.viver.data.models
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -33,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -111,7 +113,8 @@ fun SingleButton(
     isLoading: Boolean,
     buttonName: String,
     colorButton: Color,
-    colorText: Color
+    colorText: Color,
+    modifier: Modifier = Modifier
 ) {
     Button(
         onClick = onClick,
@@ -144,12 +147,85 @@ fun SingleButton(
     }
 }
 
+@Composable
+fun DoubleButton(
+    onClickCancel: () -> Unit,
+    onClickConfirm: () -> Unit,
+    isLoading: Boolean,
+) {
+    Row (
+        modifier = Modifier
+            .fillMaxWidth()
+    ){
+        Button(
+            onClick = onClickCancel,
+            enabled = !isLoading,
+            modifier = Modifier
+                .fillMaxWidth(0.5f)
+                .padding(horizontal = 16.dp)
+                .height(50.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color.Transparent)
+                .border(
+                    1.dp,
+                    color = colorResource(id = R.color.First),
+                    shape = RoundedCornerShape(8.dp)
+                ),
+            colors = ButtonDefaults.buttonColors(Color.Transparent)
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    color = colorResource(id = R.color.First),
+                    modifier = Modifier.testTag("progress_indicator")
+                )
+            } else {
+                Text(
+                    text = stringResource(id = R.string.cancelar),
+                    color = colorResource(id = R.color.First),
+                    fontSize = 22.sp,
+                )
+            }
+        }
+
+        Button(
+            onClick = onClickConfirm,
+            enabled = !isLoading,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .height(50.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(colorResource(id = R.color.First))
+                .border(
+                    1.dp,
+                    color = colorResource(id = R.color.First),
+                    shape = RoundedCornerShape(8.dp)
+                ),
+            colors = ButtonDefaults.buttonColors(Color.Transparent)
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    color = Color.White,
+                    modifier = Modifier.testTag("progress_indicator")
+                )
+            } else {
+                Text(
+                    text = stringResource(id = R.string.continuar),
+                    color = Color.White,
+                    fontSize = 22.sp,
+                )
+            }
+        }
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable
 fun Preview() {
-    TextBox(value = "", onValueChange = {}, label = "Email")
+//    TextBox(value = "", onValueChange = {}, label = "Email")
 //    SingleButton(onClick = { /*TODO*/ }, isLoading = true, buttonName = "Login", colorResource(id = R.color.First), colorResource(id = R.color.First))
+    DoubleButton(onClickCancel = { /*TODO*/ }, onClickConfirm = { /*TODO*/ }, isLoading = false)
 }
 
 
