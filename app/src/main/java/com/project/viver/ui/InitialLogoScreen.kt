@@ -1,6 +1,7 @@
 package com.project.viver.ui
 
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -16,20 +17,23 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.project.viver.R
 import com.project.viver.ViverScreen
+import com.project.viver.ViverViewModel
 import kotlinx.coroutines.delay
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun InitialLogoScreen(
     navController: NavHostController,
-    isLoggedIn: Boolean
+    viewModel: ViverViewModel,
+    context: Context
 ) {
     // Tela inicial com a logo que aparece por 4 segundos
     LaunchedEffect(key1 = true) {
         delay(2000)
-        if (isLoggedIn) {
+        if (viewModel.checkIfUserLoggedIn(context)) {
             navController.navigate(ViverScreen.Home.name)
             return@LaunchedEffect
         }
@@ -53,8 +57,11 @@ fun InitialLogoScreen(
 @Preview(showBackground = true)
 @Composable
 fun InitialLogoScreenPreview() {
+    val navController = rememberNavController()
+    val viewModel = ViverViewModel()
     InitialLogoScreen(
         navController = NavHostController(LocalContext.current),
-        isLoggedIn = true,
+        context = navController.context,
+        viewModel = viewModel
     )
 }

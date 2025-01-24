@@ -8,7 +8,7 @@ data class OrderUiStateUser (
     val name: String? = "",
     val surname: String? = "",
     val email: String = "",
-    val password: String = "",
+    var password: String = "",
     val sex: String? = "",
     val restrictions: String? = "",
     val weight: Int? = 0,

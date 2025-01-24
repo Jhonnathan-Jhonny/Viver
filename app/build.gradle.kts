@@ -92,6 +92,9 @@ dependencies {
 
     // Ktor for Supabase
     implementation("io.ktor:ktor-client-android:2.3.7")
+    implementation("io.ktor:ktor-client-cio:2.3.7") // Ktor CIO engine
+    implementation("io.ktor:ktor-client-serialization:2.3.7") // Para usar JSON
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.7") // Negociação de conteúdo
 
     // Logging (SLF4J)
     implementation("org.slf4j:slf4j-simple:1.7.32")

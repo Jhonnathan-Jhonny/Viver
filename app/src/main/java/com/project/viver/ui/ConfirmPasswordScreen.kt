@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -32,7 +33,7 @@ fun ConfirmPasswordScreen(
     viewModel: ViverViewModel
 ) {
     val confirmPassword = remember { mutableStateOf("") }
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState(UserState.Loading)
     val userProfile by viewModel.userProfile.observeAsState()
 
     // Controle de loading agora vem do ViewModel
@@ -41,6 +42,18 @@ fun ConfirmPasswordScreen(
 
     // Armazenar erro de validação de senha vazia
     val passwordError = remember { mutableStateOf("") }
+
+    // Verificar se a autenticação foi bem-sucedida e chamar a ação correspondente
+    LaunchedEffect(uiState) {
+        if (uiState is UserState.Success) {
+            // Verifica explicitamente se a mensagem de sucesso é esperada
+            val successMessage = (uiState as UserState.Success).message
+            if (successMessage == "Senha confirmada.") {
+                viewModel.userProfile.value!!.password = confirmPassword.value
+                onConfirmButtonClicked()
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -73,9 +86,9 @@ fun ConfirmPasswordScreen(
         }
 
         // Exibir erro caso a senha esteja vazia
-        passwordError.value?.let {
+        if (passwordError.value.isNotBlank()) {
             Text(
-                text = it,
+                text = passwordError.value,
                 color = Color.Red,
                 fontSize = 14.sp,
                 modifier = Modifier
@@ -86,25 +99,18 @@ fun ConfirmPasswordScreen(
         DoubleButton(
             onClickCancel = { onCancelButtonClicked() },
             onClickConfirm = {
-                // Verifica se o campo de senha está vazio
                 if (confirmPassword.value.isBlank()) {
-                    // Se estiver vazio, exibe um erro
                     passwordError.value = "A senha não pode ser vazia."
                 } else {
-                    passwordError.value = "" // Limpa a mensagem de erro
+                    passwordError.value = ""
                     val email = userProfile?.email ?: ""
                     viewModel.confirmPassword(email, confirmPassword.value)
-                    if (uiState is UserState.Success) {
-                        onConfirmButtonClicked()
-                    }
                 }
             },
             isLoading = isLoading
         )
     }
 }
-
-
 
 @Preview(showBackground = true)
 @Composable

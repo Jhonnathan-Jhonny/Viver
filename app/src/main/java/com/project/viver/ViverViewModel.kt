@@ -1,5 +1,8 @@
+@file:OptIn(InternalAPI::class)
+
 package com.project.viver
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,6 +16,7 @@ import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
+import io.ktor.util.InternalAPI
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -121,11 +125,14 @@ open class ViverViewModel : ViewModel() {
         }
     }
 
-
     fun checkIfUserLoggedIn(context: Context): Boolean {
         val token = getToken(context)
-        return !token.isNullOrEmpty()
+        Log.e("Minha pica", "Erro: $token")
+
+        // Verificar se o token é nulo, vazio ou começa com o prefixo inválido
+        return !token.isNullOrEmpty() && !token.startsWith("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9")
     }
+
 
     suspend fun logInUser(context: Context, email: String, password: String): UserState {
         return try {
@@ -145,9 +152,8 @@ open class ViverViewModel : ViewModel() {
     fun logOutUser(context: Context) {
         viewModelScope.launch {
             try {
-                supabase.auth.signOut()
                 val sharedPref = SharedPreferenceHelper(context)
-                sharedPref.saveStringData("accessToken", "")
+                sharedPref.saveStringData("accessToken", null)
                 _uiState.value = UserState.Success("Logged out user successfully")
             } catch (e: Exception) {
                 _uiState.value = UserState.Error("Error during logout: ${e.message}")
@@ -227,5 +233,31 @@ open class ViverViewModel : ViewModel() {
         }
     }
 
+    suspend fun updatePassword(context: Context, newPassword: String) {
+        // Importando o token da chave de serviço
+        supabase.auth.importAuthToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5aW9lZHNqcHdrcnFwaXluYXhjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczNTgyNTU5OSwiZXhwIjoyMDUxNDAxNTk5fQ.zjr5ShFjvXXPx2QpSfjcfXF73oNC_h5Gy400GfQ6_zw")
+
+        // Recuperando o token da sessão
+        val token = getToken(context)
+        if (token.isNullOrEmpty()) {
+            _uiState.value = UserState.Error("Token não encontrado.")
+            return
+        }
+
+        // Recuperando o usuário autenticado e seu email
+        val user = supabase.auth.retrieveUser(token)
+        if (user.id.isEmpty()) {
+            _uiState.value = UserState.Error("ID do usuário não encontrado.")
+            return
+        }
+        try {
+            supabase.auth.admin.updateUserById(user.id) {
+                this.password = newPassword
+            }
+            _uiState.value = UserState.Success("Senha atualizada com sucesso.")
+        } catch (e: Exception) {
+            _uiState.value = UserState.Error("Erro ao atualizar a senha: ${e.message ?: "Erro desconhecido"}")
+        }
+    }
 
 }

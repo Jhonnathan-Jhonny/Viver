@@ -266,8 +266,6 @@ fun ViverApp(
 
     val context = LocalContext.current
 
-    val isLoggedIn = viewModel.checkIfUserLoggedIn(context)
-
     LaunchedEffect(Unit) {
         viewModel.isUserLoggedIn(
             context
@@ -283,7 +281,8 @@ fun ViverApp(
                 ViverScreen.SignUp,
                 ViverScreen.ValidateEmail,
                 ViverScreen.EditedPasswordSuccessfully,
-                ViverScreen.ConfirmPassword -> {
+                ViverScreen.ConfirmPassword,
+                ViverScreen.NewPassword -> {
                     ViverAppTopBar1(
                         currentScreen = currentScreen,
                         canNavigateBack = canNavigateBack,
@@ -321,7 +320,8 @@ fun ViverApp(
             composable(route = ViverScreen.Transition.name) {
                 InitialLogoScreen(
                     navController = navController,
-                    isLoggedIn = isLoggedIn
+                    viewModel = viewModel,
+                    context = context,
                 )
             }
             composable(route = ViverScreen.StartOrder.name) {
@@ -375,15 +375,19 @@ fun ViverApp(
             }
             composable(route = ViverScreen.ConfirmPassword.name) {
                 ConfirmPasswordScreen(
-                    onConfirmButtonClicked = {navController.navigate(ViverScreen.EditedPasswordSuccessfully.name)},
+                    onConfirmButtonClicked = {navController.navigate(ViverScreen.NewPassword.name)},
                     onCancelButtonClicked = {navController.navigate(ViverScreen.Profile.name)},
                     viewModel = viewModel
                 )
             }
             composable(route = ViverScreen.NewPassword.name) {
                 NewPasswordScreen(
-                    onConfirmButtonClicked = {navController.navigate(ViverScreen.EditedPasswordSuccessfully.name)},
-                    onCancelButtonClicked = {navController.navigate(ViverScreen.Profile.name)})
+                    onConfirmButtonClicked = {navController.navigate(ViverScreen.Login.name)},
+                    onCancelButtonClicked = {navController.navigate(ViverScreen.Profile.name)},
+                    context = context,
+                    viewModel = viewModel,
+                    previousPassword = viewModel.userProfile.value?.password ?: ""
+                )
             }
 //                    composable(route = ViverScreen.ValidateEmail.name) {
 //                        ValidateEmailScreen(navController = navController)
