@@ -20,6 +20,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -41,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -60,18 +62,22 @@ import com.project.viver.ViverViewModel
 import com.project.viver.data.models.OrderUiStateUser
 import com.project.viver.data.models.TextBox
 import com.project.viver.data.models.UserState
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileScreen(
     viewModel: ViverViewModel,
     context: Context,
-    onEditPasswordButtonClicked: () -> Unit
+    onEditPasswordButtonClicked: () -> Unit,
+    onDeleteActionConfirmedButtonClicked: () -> Unit
 ) {
     val userProfile by viewModel.userProfile.observeAsState()
     val userState by viewModel.uiState.collectAsState()
 
     // Busca os dados do usuário
-    LaunchedEffect(key1 = Unit) {
+    LaunchedEffect(key1 = true) {
         viewModel.fetchUserProfile(context)
     }
     Box(
@@ -104,18 +110,26 @@ fun ProfileScreen(
                 }
             }
             is UserState.Success -> {
-                ProfileContent(userProfile = userProfile, context = context, onEditPasswordButtonClicked = onEditPasswordButtonClicked)
+                ProfileContent(
+                    userProfile = userProfile,
+                    context = context,
+                    onEditPasswordButtonClicked = onEditPasswordButtonClicked,
+                    onDeleteActionConfirmedButtonClicked = onDeleteActionConfirmedButtonClicked,
+
+                )
             }
         }
     }
 }
 
+@OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun ProfileContent(
     userProfile: OrderUiStateUser?,
     onEditPasswordButtonClicked: () -> Unit,
     viewModel: ViverViewModel = ViverViewModel(),
-    context: Context
+    context: Context,
+    onDeleteActionConfirmedButtonClicked: () -> Unit
 ) {
     var isEditing by remember { mutableStateOf(false) }
     val name = remember { mutableStateOf(userProfile?.name ?: "") }
@@ -125,11 +139,23 @@ fun ProfileContent(
 
     val scrollState = rememberScrollState()
 
+    val showDeleteDialog = remember { mutableStateOf(false) } // Estado para exibir o diálogo
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .background(colorResource(id = R.color.First))
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        colorResource(id = R.color.First), // Verde
+                        Color.White,
+                        Color.White // Branco ocupa mais espaço
+                    ),
+                    startY = 0f,
+                    endY = 1000f // Ajuste conforme necessário
+                )
+            )
     ) {
         Box(
             modifier = Modifier
@@ -175,14 +201,14 @@ fun ProfileContent(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = userProfile?.name ?: "Carregando...",
+                    text = name.value ?: "Carregando...",
                     color = Color.Black,
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.padding(end = 8.dp), // Espaço entre nome e sobrenome
                     textAlign = TextAlign.Center
                 )
                 Text(
-                    text = userProfile?.surname ?: "Carregando...",
+                    text = surname.value ?: "Carregando...",
                     color = Color.Black,
                     style = MaterialTheme.typography.headlineSmall,
                     textAlign = TextAlign.Center
@@ -263,16 +289,13 @@ fun ProfileContent(
                     onNext = { focusManager.clearFocus() },
                     onValueChange = { sex.value = it }
                 )
-                ProfileInfoRow(
-                    label = stringResource(R.string.restri_es_alimentares),
-                    value = userProfile?.restrictions ?: "Não informado"
-                )
+
             }
 
             // Botão de desativar conta
             Spacer(modifier = Modifier.weight(1f))
             Button(
-                onClick = { /* Ação de desativar conta */ },
+                onClick = { showDeleteDialog.value = true }, // Exibe o diálogo ao clicar
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -288,6 +311,52 @@ fun ProfileContent(
                     text = "Desativar conta",
                     color = Color.Red,
                     fontSize = 15.sp
+                )
+            }
+
+            // Diálogo de confirmação
+            if (showDeleteDialog.value) {
+                AlertDialog(
+                    onDismissRequest = { showDeleteDialog.value = false }, // Fecha o diálogo ao clicar fora
+                    title = {
+                        Text(
+                            text = "Confirmação",
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = Color.Black
+                        )
+                    },
+                    text = {
+                        Text(
+                            text = "Realmente deseja apagar permanentemente sua conta?",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.Black
+                        )
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                showDeleteDialog.value = false
+                                GlobalScope.launch {
+                                    viewModel.deleteUser(context)
+                                    viewModel.logOutUser(context)
+                                }
+                                onDeleteActionConfirmedButtonClicked()
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                        ) {
+                            Text(text = "Sim", color = Color.White)
+                        }
+                    },
+                    dismissButton = {
+                        Button(
+                            onClick = { showDeleteDialog.value = false }, // Fecha o diálogo
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+                        ) {
+                            Text(text = "Não", color = Color.White)
+                        }
+                    },
+                    shape = RoundedCornerShape(16.dp),
+                    containerColor = Color.White
                 )
             }
         }
@@ -506,7 +575,9 @@ fun ProfileScreenPreview() {
     ProfileContent(
         userProfile = OrderUiStateUser(name = "Jhonnathan",
         surname = "Rodrigues", sex = "M"),
+        onEditPasswordButtonClicked = { ViverScreen.ConfirmPassword.name},
         context = LocalContext.current,
-        onEditPasswordButtonClicked = { ViverScreen.ConfirmPassword.name})
+        onDeleteActionConfirmedButtonClicked = { }
+    )
 //    ProfileScreen(ViverViewModel(),navController.context) { ViverScreen.Profile }
 }

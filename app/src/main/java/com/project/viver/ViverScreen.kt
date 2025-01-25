@@ -267,10 +267,8 @@ fun ViverApp(
 
     val context = LocalContext.current
 
-    LaunchedEffect(Unit) {
-        viewModel.isUserLoggedIn(
-            context
-        )
+    LaunchedEffect(key1 = true) {
+        viewModel.isUserLoggedIn(context)
     }
 
     Scaffold(
@@ -371,6 +369,7 @@ fun ViverApp(
                 ProfileScreen(
                     viewModel = viewModel,
                     onEditPasswordButtonClicked = {navController.navigate(ViverScreen.ConfirmPassword.name)},
+                    onDeleteActionConfirmedButtonClicked = {navController.navigate(ViverScreen.Login.name)},
                     context = context
                 )
             }

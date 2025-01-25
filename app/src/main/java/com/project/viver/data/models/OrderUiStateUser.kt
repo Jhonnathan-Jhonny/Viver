@@ -10,7 +10,6 @@ data class OrderUiStateUser (
     val email: String = "",
     var password: String = "",
     val sex: String? = "",
-    val restrictions: String? = "",
     val weight: Int? = 0,
     val physicalActivityLevel: Int? = 0,
 )

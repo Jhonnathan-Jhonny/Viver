@@ -2,7 +2,6 @@
 
 package com.project.viver
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -68,7 +67,7 @@ open class ViverViewModel : ViewModel() {
                 // Consulta o perfil do usuário na tabela 'users'
                 val response = supabase
                     .from("users")
-                    .select(columns = Columns.list("name, surname, sex, restrictions")){
+                    .select(columns = Columns.list("name, surname, sex")){
                         filter {
                             eq("idAuth", userId)
                         }
@@ -127,9 +126,6 @@ open class ViverViewModel : ViewModel() {
 
     fun checkIfUserLoggedIn(context: Context): Boolean {
         val token = getToken(context)
-        Log.e("Minha pica", "Erro: $token")
-
-        // Verificar se o token é nulo, vazio ou começa com o prefixo inválido
         return !token.isNullOrEmpty() && !token.startsWith("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9")
     }
 
@@ -260,25 +256,37 @@ open class ViverViewModel : ViewModel() {
         }
     }
 
-    suspend fun deletUser(context: Context)
-    {
+    suspend fun deleteUser(context: Context) {
+        supabase.auth.importAuthToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5aW9lZHNqcHdrcnFwaXluYXhjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczNTgyNTU5OSwiZXhwIjoyMDUxNDAxNTk5fQ.zjr5ShFjvXXPx2QpSfjcfXF73oNC_h5Gy400GfQ6_zw")
+
+        // Obtendo o token do contexto
         val token = getToken(context)
         if (token.isNullOrEmpty()) {
-            _uiState.value = UserState.Error("Token não encontrado.")
+            _uiState.value = UserState.Error("Token de autenticação não encontrado.")
             return
         }
 
-        val user = supabase.auth.retrieveUser(token)
-        if (user.id.isEmpty()) {
-            _uiState.value = UserState.Error("ID do usuário não encontrado.")
-            return
-        }
         try {
+            // Recuperando o usuário autenticado
+            val user = supabase.auth.retrieveUser(token)
+
+            // Deletando o usuário pelo ID
             supabase.auth.admin.deleteUser(user.id)
+            supabase
+                .from("users")
+                .delete{
+                    filter {
+                        eq("idAuth", user.id)
+                    }
+                }
+
+            // Atualizando o estado para sucesso
             _uiState.value = UserState.Success("Usuário deletado com sucesso.")
         } catch (e: Exception) {
-            _uiState.value = UserState.Error("Erro ao deletar usuário: ${e.message ?: "Erro desconhecido"}")
+            // Atualizando o estado para erro com mensagem detalhada
+            _uiState.value = UserState.Error("Erro ao deletar o usuário: ${e.message ?: "Erro desconhecido"}")
         }
     }
+
 
 }
