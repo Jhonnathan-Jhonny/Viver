@@ -260,4 +260,25 @@ open class ViverViewModel : ViewModel() {
         }
     }
 
+    suspend fun deletUser(context: Context)
+    {
+        val token = getToken(context)
+        if (token.isNullOrEmpty()) {
+            _uiState.value = UserState.Error("Token não encontrado.")
+            return
+        }
+
+        val user = supabase.auth.retrieveUser(token)
+        if (user.id.isEmpty()) {
+            _uiState.value = UserState.Error("ID do usuário não encontrado.")
+            return
+        }
+        try {
+            supabase.auth.admin.deleteUser(user.id)
+            _uiState.value = UserState.Success("Usuário deletado com sucesso.")
+        } catch (e: Exception) {
+            _uiState.value = UserState.Error("Erro ao deletar usuário: ${e.message ?: "Erro desconhecido"}")
+        }
+    }
+
 }
