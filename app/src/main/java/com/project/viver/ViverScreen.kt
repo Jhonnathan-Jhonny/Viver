@@ -42,6 +42,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.project.viver.ui.ConfirmPasswordScreen
+import com.project.viver.ui.EditedPasswordSuccessfullyScreen
 import com.project.viver.ui.ForgotPasswordScreen
 import com.project.viver.ui.HomeScreen
 import com.project.viver.ui.InitialLogoScreen
@@ -382,11 +383,16 @@ fun ViverApp(
             }
             composable(route = ViverScreen.NewPassword.name) {
                 NewPasswordScreen(
-                    onConfirmButtonClicked = {navController.navigate(ViverScreen.Login.name)},
+                    onConfirmButtonClicked = {navController.navigate(ViverScreen.EditedPasswordSuccessfully.name)},
                     onCancelButtonClicked = {navController.navigate(ViverScreen.Profile.name)},
                     context = context,
                     viewModel = viewModel,
                     previousPassword = viewModel.userProfile.value?.password ?: ""
+                )
+            }
+            composable(route = ViverScreen.EditedPasswordSuccessfully.name) {
+                EditedPasswordSuccessfullyScreen(
+                    onOkButtonClick = {navController.navigate(ViverScreen.Login.name)}
                 )
             }
 //                    composable(route = ViverScreen.ValidateEmail.name) {
@@ -400,9 +406,6 @@ fun ViverApp(
 //                    }
 //                    composable(route = ViverScreen.EmailSent.name) {
 //                        EmailSentScreen(navController = navController)
-//                    }
-//                    composable(route = ViverScreen.EditedPasswordSuccessfully.name) {
-//                        EditedPasswordSuccessfullyScreen(navController = navController)
 //                    }
 //                    composable(route = ViverScreen.EspecificList.name) {
 //                        EspecificListScreen(navController = navController)
