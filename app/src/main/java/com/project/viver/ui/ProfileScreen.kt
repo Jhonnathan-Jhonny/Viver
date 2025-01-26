@@ -573,7 +573,8 @@ fun GenderRadioButton(
 fun ProfileScreenPreview() {
     val navController = rememberNavController()
     ProfileContent(
-        userProfile = OrderUiStateUser(name = "Jhonnathan",
+        userProfile = OrderUiStateUser(
+            name = "Jhonnathan",
         surname = "Rodrigues", sex = "M"),
         onEditPasswordButtonClicked = { ViverScreen.ConfirmPassword.name},
         context = LocalContext.current,

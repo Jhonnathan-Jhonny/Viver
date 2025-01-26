@@ -67,14 +67,14 @@ open class ViverViewModel : ViewModel() {
                 // Consulta o perfil do usuário na tabela 'users'
                 val response = supabase
                     .from("users")
-                    .select(columns = Columns.list("name, surname, sex")){
+                    .select(columns = Columns.list("name, surname, sex, weight, physical_activity_level")) {
                         filter {
                             eq("idAuth", userId)
                         }
                     }
                     .decodeSingleOrNull<OrderUiStateUser>()
 
-                // Agora, adicione o email à resposta
+                // Adiciona o email e atualiza o userProfile
                 if (response != null) {
                     _userProfile.value = response.copy(email = email)
                 }
@@ -86,6 +86,7 @@ open class ViverViewModel : ViewModel() {
             }
         }
     }
+
 
     open suspend fun signUpUser(context: Context, user: OrderUiStateUser): UserState {
         return try {
@@ -288,5 +289,41 @@ open class ViverViewModel : ViewModel() {
         }
     }
 
+    fun updateUserInfoForNewList(user: OrderUiStateUser, context: Context) {
+        viewModelScope.launch {
+            try {
+                _uiState.value = UserState.Loading
+                val token = getToken(context)
+                if (token.isNullOrEmpty()) {
+                    _uiState.value = UserState.Error("Token não encontrado.")
+                    return@launch
+                }
+
+                val userId = supabase.auth.retrieveUser(token).id
+
+                // Atualizar no banco de dados
+                supabase
+                    .from("users")
+                    .update(
+                        mapOf(
+                            "weight" to user.weight,
+                            "physical_activity_level" to user.physical_activity_level
+                        )
+                    ) {
+                        filter {
+                            eq("idAuth", userId)
+                        }
+                    }
+
+                _uiState.value = UserState.Success("Peso e nível de atividade atualizados com sucesso.")
+            } catch (e: Exception) {
+                _uiState.value = UserState.Error("Erro ao atualizar Peso e nível de atividade: ${e.message ?: "Erro desconhecido"}")
+            }
+        }
+    }
+
+    fun resetUserState() {
+        _uiState.value = UserState.Loading
+    }
 
 }

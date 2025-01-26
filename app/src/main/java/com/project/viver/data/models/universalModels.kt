@@ -223,9 +223,9 @@ fun DoubleButton(
 @Preview(showBackground = true)
 @Composable
 fun Preview() {
-//    TextBox(value = "", onValueChange = {}, label = "Email")
+    TextBox(value = "", onValueChange = {}, label = "Email")
 //    SingleButton(onClick = { /*TODO*/ }, isLoading = true, buttonName = "Login", colorResource(id = R.color.First), colorResource(id = R.color.First))
-    DoubleButton(onClickCancel = { /*TODO*/ }, onClickConfirm = { /*TODO*/ }, isLoading = false)
+//    DoubleButton(onClickCancel = { /*TODO*/ }, onClickConfirm = { /*TODO*/ }, isLoading = false)
 }
 
 

@@ -45,8 +45,10 @@ import com.project.viver.ui.ConfirmPasswordScreen
 import com.project.viver.ui.EditedPasswordSuccessfullyScreen
 import com.project.viver.ui.ForgotPasswordScreen
 import com.project.viver.ui.HomeScreen
+import com.project.viver.ui.InformationForNewListScreen
 import com.project.viver.ui.InitialLogoScreen
 import com.project.viver.ui.LoginScreen
+import com.project.viver.ui.NewListScreen
 import com.project.viver.ui.NewPasswordScreen
 import com.project.viver.ui.ProfileScreen
 import com.project.viver.ui.SignUpScreen
@@ -64,7 +66,7 @@ enum class ViverScreen {
     NewList,
     NewPassword,
     Profile,
-    Restrictions,
+    InformationForNewList,
     SignUp,
     StartOrder,
     ValidateEmail,
@@ -290,7 +292,7 @@ fun ViverApp(
                 }
                 ViverScreen.Home,
                 ViverScreen.Profile,
-                ViverScreen.Restrictions,
+                ViverScreen.InformationForNewList,
                 ViverScreen.NewList,
                 ViverScreen.Lists,
                 ViverScreen.EspecificList -> {
@@ -359,9 +361,8 @@ fun ViverApp(
             }
             composable(route = ViverScreen.Home.name) {
                 HomeScreen(
-                    onNewListButtonClicked = {navController.navigate(ViverScreen.NewList.name)},
+                    onNewListButtonClicked = {navController.navigate(ViverScreen.InformationForNewList.name)},
                     onListsButtonClicked = {navController.navigate(ViverScreen.Lists.name)},
-                    onProfileButtonClicked = {navController.navigate(ViverScreen.Profile.name)},
                     viewModel = viewModel,
                 )
             }
@@ -394,18 +395,17 @@ fun ViverApp(
                     onOkButtonClick = {navController.navigate(ViverScreen.Login.name)}
                 )
             }
-//                    composable(route = ViverScreen.ValidateEmail.name) {
-//                        ValidateEmailScreen(navController = navController)
-//                    }
-//                    composable(route = ViverScreen.Restrictions.name) {
-//                        RestrictionsScreen(navController = navController)
-//                    }
-//                    composable(route = ViverScreen.NewList.name) {
-//                        NewListScreen(navController = navController)
-//                    }
-//                    composable(route = ViverScreen.EmailSent.name) {
-//                        EmailSentScreen(navController = navController)
-//                    }
+            composable(route = ViverScreen.InformationForNewList.name) {
+                InformationForNewListScreen(
+                    onCancelButtonClicked = {navController.navigate(ViverScreen.Home.name)},
+                    onNextButtonClicked = {navController.navigate(ViverScreen.NewList.name)},
+                    viewModel = viewModel,
+                    context = context
+                )
+            }
+            composable(route = ViverScreen.NewList.name) {
+                NewListScreen()
+            }
 //                    composable(route = ViverScreen.EspecificList.name) {
 //                        EspecificListScreen(navController = navController)
 //                    }
@@ -419,7 +419,7 @@ fun ViverApp(
 @Preview(showBackground = true)
 @Composable
 fun ViverAppPreview() {
-    ViverApp()
+//    ViverApp()
 //    ViverAppTopBar1(
 //        currentScreen = ViverScreen.Login,
 //        canNavigateBack = true,

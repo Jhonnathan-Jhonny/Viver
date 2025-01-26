@@ -16,12 +16,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.project.viver.R
 import com.project.viver.ViverViewModel
 import com.project.viver.data.models.SingleButton
@@ -31,8 +29,6 @@ fun HomeScreen(
     viewModel: ViverViewModel,
     onNewListButtonClicked: () -> Unit,
     onListsButtonClicked: () -> Unit,
-    onProfileButtonClicked: () -> Unit
-
 ) {
 
     val isLoading by remember { mutableStateOf(false) }
@@ -83,11 +79,8 @@ fun HomeScreen(
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    val navController = NavController(LocalContext.current)
     val viewModel = ViverViewModel()
-//    HomeScreen({
-//        viewModel = viewModel,
-//        navController.navigate(ViverScreen.NewList.name) }, {
-//        navController.navigate(ViverScreen.Lists.name),
-//    }) { navController.navigate(ViverScreen.Profile.name) }
+    HomeScreen(
+        viewModel = viewModel, onNewListButtonClicked = { /*TODO*/ }) {
+    }
 }
