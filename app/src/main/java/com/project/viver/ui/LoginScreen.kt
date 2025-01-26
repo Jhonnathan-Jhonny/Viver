@@ -2,6 +2,7 @@ package com.project.viver.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,8 +16,6 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -68,8 +67,6 @@ fun LoginScreen(
     var passwordError by remember { mutableStateOf("") }
 
     var isValid by remember { mutableStateOf(true) }
-    val snackbarHostState = remember { SnackbarHostState() }
-
 
     fun validateFields(): Boolean {
         isValid = true
@@ -90,7 +87,6 @@ fun LoginScreen(
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         content = {
             Column(
                 modifier = Modifier
@@ -180,10 +176,11 @@ fun LoginScreen(
                                 val result = viewModel.logInUser(context, email.value, password.value)
                                 isLoading = false
                                 if (result is UserState.Success) {
+                                    Toast.makeText(context, "Logado com sucesso", Toast.LENGTH_LONG).show()
                                     onLoginButtonClicked()
                                 }
                                 else if (result is UserState.Error) {
-                                    snackbarHostState.showSnackbar(result.message)
+                                    Toast.makeText(context, "Usuário inexistente ou email ou senha incorreta", Toast.LENGTH_LONG).show()
                                 }
                             }
                         }

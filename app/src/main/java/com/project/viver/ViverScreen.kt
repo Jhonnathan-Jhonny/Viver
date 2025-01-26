@@ -363,7 +363,6 @@ fun ViverApp(
                 HomeScreen(
                     onNewListButtonClicked = {navController.navigate(ViverScreen.InformationForNewList.name)},
                     onListsButtonClicked = {navController.navigate(ViverScreen.Lists.name)},
-                    viewModel = viewModel,
                 )
             }
             composable(route = ViverScreen.Profile.name) {

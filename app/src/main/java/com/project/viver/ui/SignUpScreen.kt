@@ -2,6 +2,7 @@ package com.project.viver.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,8 +21,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -75,7 +74,6 @@ fun SignUpScreen(
     var passwordConfirmError by remember { mutableStateOf("") }
 
     var isLoading by remember { mutableStateOf(false) }
-    val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
     val focusManager = LocalFocusManager.current
@@ -123,7 +121,6 @@ fun SignUpScreen(
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) {
         Column(
             modifier = Modifier
@@ -292,9 +289,10 @@ fun SignUpScreen(
                             )
                             isLoading = false
                             if (result is UserState.Success) {
+                                Toast.makeText(context, "Cadastrado com sucesso", Toast.LENGTH_LONG).show()
                                 onSignUpButtonClicked()
                             } else if (result is UserState.Error) {
-                                snackbarHostState.showSnackbar("Email já cadastrado")
+                                Toast.makeText(context, "Email já cadastrado", Toast.LENGTH_LONG).show()
                             }
                         }
                     }
