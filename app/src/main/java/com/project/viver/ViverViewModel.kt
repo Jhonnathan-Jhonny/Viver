@@ -348,7 +348,7 @@ open class ViverViewModel : ViewModel() {
         Food(name = "Quinoa", calories = 120, protein = 4.1, fat = 1.9, carbs = 21.3)
     )
 
-    val meal = mutableStateListOf<String>()
+    val meal = mutableStateListOf<List<String>>()  // Alterando para uma lista de listas
     val totals = mutableStateMapOf<String, Double>()
 
     // Função para gerar o plano alimentar
@@ -358,7 +358,7 @@ open class ViverViewModel : ViewModel() {
 
         // 2. Calcular macronutrientes
         val proteinGrams = weight * 2 // 2g de proteína por kg
-        val fatGrams = weight * 0.8 // Média de 0.8g de gordura por kg (pode variar de 0.5 a 1)
+        val fatGrams = weight * 0.8 // Média de 0.8g de gordura por kg
         val proteinCalories = proteinGrams * 4
         val fatCalories = fatGrams * 9
         val carbCalories = dailyCalories - (proteinCalories + fatCalories)
@@ -370,9 +370,9 @@ open class ViverViewModel : ViewModel() {
         val afternoonSnack = createMeal(proteinGrams / 4, fatGrams / 4, carbGrams / 4)
         val dinner = createMeal(proteinGrams / 4, fatGrams / 4, carbGrams / 4)
 
-        // 4. Adicionar as refeições ao estado
+        // 4. Adicionar as refeições ao estado (agora uma lista de listas)
         meal.clear()
-        meal.addAll(morningSnack + lunch + afternoonSnack + dinner)
+        meal.addAll(listOf(morningSnack, lunch, afternoonSnack, dinner))
 
         // 5. Adicionar totais de macronutrientes
         totals["calories"] = dailyCalories
@@ -382,25 +382,41 @@ open class ViverViewModel : ViewModel() {
     }
 
     // Função para criar uma refeição com alimentos selecionados
-    private fun createMeal(protein: Double, fat: Double, carbs: Double): List<String> {
-        val selectedProteins = selectFoods(foodDatabase.filter { it.protein > 10 }, protein)
-        val selectedFats = selectFoods(foodDatabase.filter { it.fat > 5 }, fat)
-        val selectedCarbs = selectFoods(foodDatabase.filter { it.carbs > 10 }, carbs)
+    fun createMeal(protein: Double, fat: Double, carbs: Double): List<String> {
+        val selectedProteins = selectFoods(foodDatabase.filter { it.protein > 10 }, protein, "protein")
+        val selectedFats = selectFoods(foodDatabase.filter { it.fat > 5 }, fat, "fat")
+        val selectedCarbs = selectFoods(foodDatabase.filter { it.carbs > 10 }, carbs, "carb")
 
         return selectedProteins + selectedFats + selectedCarbs
     }
 
     // Função para selecionar alimentos com base na quantidade de macronutrientes necessária
-    private fun selectFoods(foods: List<Food>, requiredGrams: Double): List<String> {
+    private fun selectFoods(foods: List<Food>, requiredGrams: Double, macronutrientType: String): List<String> {
         val meal = mutableListOf<String>()
         var remainingGrams = requiredGrams
 
         for (food in foods) {
             if (remainingGrams <= 0) break
-            val portion = (remainingGrams / food.protein).coerceAtMost(100.0) // Ajuste para porções máximas
-            remainingGrams -= food.protein * (portion / 100)
-            meal.add("${portion.toInt()}g de ${food.name} (Proteína: ${food.protein * portion / 100}g, Calorias: ${food.calories * portion / 100}kcal)")
+            // A porção será baseada no tipo de macronutriente
+            val portion = (remainingGrams / when(macronutrientType) {
+                "protein" -> food.protein
+                "fat" -> food.fat
+                "carb" -> food.carbs
+                else -> 1.0
+            }).coerceAtMost(100.0) // Limitar a porção a 100g por alimento
+
+            remainingGrams -= when(macronutrientType) {
+                "protein" -> food.protein * (portion / 100)
+                "fat" -> food.fat * (portion / 100)
+                "carb" -> food.carbs * (portion / 100)
+                else -> 0.0
+            }
+
+            // Exibir apenas o nome do alimento e a quantidade em gramas
+            meal.add("${food.name} - ${portion.toInt()}g")
         }
+
         return meal
     }
+
 }

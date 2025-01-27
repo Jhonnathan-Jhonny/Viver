@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,7 +25,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.project.viver.ViverViewModel
 
-
 @SuppressLint("MutableCollectionMutableState")
 @Composable
 fun NewListScreen(viewModel: ViverViewModel) {
@@ -31,8 +32,11 @@ fun NewListScreen(viewModel: ViverViewModel) {
     val totals by remember { mutableStateOf(viewModel.totals) }
     val userProfile by remember { mutableStateOf(viewModel.userProfile) }
 
-    val weight = userProfile.value!!.weight
-    val activityLevel = userProfile.value!!.physical_activity_level
+    //    val weight = userProfile.value!!.weight
+//    val activityLevel = userProfile.value!!.physical_activity_level
+
+    val weight = 70.0
+    val activityLevel = "Ativo"
 
     LaunchedEffect(Unit) {
         viewModel.generateMealPlan(
@@ -49,20 +53,46 @@ fun NewListScreen(viewModel: ViverViewModel) {
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(16.dp),
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
-        Text("Plano Alimentar", style = MaterialTheme.typography.headlineSmall)
+        Text(
+            text = "Plano Alimentar",
+            style = MaterialTheme.typography.headlineSmall,
+            color = Color.Black
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Exibir refeições
-        meal.forEach { item ->
-            Text(text = item, style = MaterialTheme.typography.bodyLarge)
+        // Exibir refeições com seus horários
+        meal.forEachIndexed { index, item ->
+            val mealTime = when (index) {
+                0 -> "Lanche da manhã"
+                1 -> "Almoço"
+                2 -> "Lanche da tarde"
+                else -> "Janta"
+            }
+
+            Text(
+                text = "$mealTime:",
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
+
+            // Exibir os itens da refeição
+            item.forEach { foodItem ->
+                Text(
+                    text = foodItem,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.Black
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         // Exibir totais
         Text(
@@ -75,6 +105,7 @@ fun NewListScreen(viewModel: ViverViewModel) {
         )
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
