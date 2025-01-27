@@ -2,10 +2,14 @@
 
 package com.project.viver
 import android.content.Context
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.project.viver.data.models.Food
+import com.project.viver.data.models.MealPlan
 import com.project.viver.data.models.OrderUiStateUser
 import com.project.viver.data.models.UserState
 import com.project.viver.data.network.SupabaseClient.supabase
@@ -28,6 +32,9 @@ open class ViverViewModel : ViewModel() {
 
     private val _userProfile = MutableLiveData<OrderUiStateUser>()
     val userProfile: LiveData<OrderUiStateUser> = _userProfile
+
+    private val _mealPlan = MutableStateFlow<MealPlan?>(null)
+    val mealPlan: StateFlow<MealPlan?> = _mealPlan
 
     private fun saveToken(context: Context) {
         viewModelScope.launch {
@@ -54,7 +61,7 @@ open class ViverViewModel : ViewModel() {
 
                 // Recupera o usuário autenticado e seu email
                 val user = supabase.auth.retrieveUser(token)
-                val email = user?.email
+                val email = user.email
 
                 if (email == null) {
                     _uiState.value = UserState.Error("Email não encontrado.")
@@ -192,7 +199,7 @@ open class ViverViewModel : ViewModel() {
                 val userId = supabase.auth.retrieveUser(token).id
 
                 // Atualizar no banco de dados
-                val response = supabase
+                supabase
                     .from("users")
                     .update(
                         mapOf(
@@ -218,7 +225,7 @@ open class ViverViewModel : ViewModel() {
             _uiState.value = UserState.Loading
             try {
                 // Tenta fazer login com email e senha
-                val result = supabase.auth.signInWith(Email) {
+                supabase.auth.signInWith(Email) {
                     this.email = email
                     this.password = currentPassword
                 }
@@ -326,4 +333,74 @@ open class ViverViewModel : ViewModel() {
         _uiState.value = UserState.Loading
     }
 
+    private val foodDatabase = listOf(
+        // Proteínas
+        Food(name = "Frango grelhado", calories = 165, protein = 31.0, fat = 3.6, carbs = 0.0),
+        Food(name = "Peixe assado", calories = 206, protein = 22.0, fat = 12.0, carbs = 0.0),
+        Food(name = "Ovo cozido", calories = 155, protein = 13.0, fat = 11.0, carbs = 1.1),
+        // Gorduras
+        Food(name = "Abacate", calories = 160, protein = 2.0, fat = 15.0, carbs = 9.0),
+        Food(name = "Azeite de oliva", calories = 884, protein = 0.0, fat = 100.0, carbs = 0.0),
+        Food(name = "Castanhas", calories = 607, protein = 15.0, fat = 55.0, carbs = 20.0),
+        // Carboidratos
+        Food(name = "Arroz integral", calories = 112, protein = 2.6, fat = 0.9, carbs = 23.0),
+        Food(name = "Batata-doce", calories = 86, protein = 1.6, fat = 0.1, carbs = 20.0),
+        Food(name = "Quinoa", calories = 120, protein = 4.1, fat = 1.9, carbs = 21.3)
+    )
+
+    val meal = mutableStateListOf<String>()
+    val totals = mutableStateMapOf<String, Double>()
+
+    // Função para gerar o plano alimentar
+    fun generateMealPlan(weight: Double, activityLevel: Double, calorieReduction: Int = 500) {
+        // 1. Calcular calorias diárias
+        val dailyCalories = (weight * 22 * activityLevel) - calorieReduction
+
+        // 2. Calcular macronutrientes
+        val proteinGrams = weight * 2 // 2g de proteína por kg
+        val fatGrams = weight * 0.8 // Média de 0.8g de gordura por kg (pode variar de 0.5 a 1)
+        val proteinCalories = proteinGrams * 4
+        val fatCalories = fatGrams * 9
+        val carbCalories = dailyCalories - (proteinCalories + fatCalories)
+        val carbGrams = carbCalories / 4
+
+        // 3. Criar refeições baseadas nos alimentos disponíveis
+        val morningSnack = createMeal(proteinGrams / 4, fatGrams / 4, carbGrams / 4)
+        val lunch = createMeal(proteinGrams / 4, fatGrams / 4, carbGrams / 4)
+        val afternoonSnack = createMeal(proteinGrams / 4, fatGrams / 4, carbGrams / 4)
+        val dinner = createMeal(proteinGrams / 4, fatGrams / 4, carbGrams / 4)
+
+        // 4. Adicionar as refeições ao estado
+        meal.clear()
+        meal.addAll(morningSnack + lunch + afternoonSnack + dinner)
+
+        // 5. Adicionar totais de macronutrientes
+        totals["calories"] = dailyCalories
+        totals["protein"] = proteinGrams
+        totals["fat"] = fatGrams
+        totals["carbs"] = carbGrams
+    }
+
+    // Função para criar uma refeição com alimentos selecionados
+    private fun createMeal(protein: Double, fat: Double, carbs: Double): List<String> {
+        val selectedProteins = selectFoods(foodDatabase.filter { it.protein > 10 }, protein)
+        val selectedFats = selectFoods(foodDatabase.filter { it.fat > 5 }, fat)
+        val selectedCarbs = selectFoods(foodDatabase.filter { it.carbs > 10 }, carbs)
+
+        return selectedProteins + selectedFats + selectedCarbs
+    }
+
+    // Função para selecionar alimentos com base na quantidade de macronutrientes necessária
+    private fun selectFoods(foods: List<Food>, requiredGrams: Double): List<String> {
+        val meal = mutableListOf<String>()
+        var remainingGrams = requiredGrams
+
+        for (food in foods) {
+            if (remainingGrams <= 0) break
+            val portion = (remainingGrams / food.protein).coerceAtMost(100.0) // Ajuste para porções máximas
+            remainingGrams -= food.protein * (portion / 100)
+            meal.add("${portion.toInt()}g de ${food.name} (Proteína: ${food.protein * portion / 100}g, Calorias: ${food.calories * portion / 100}kcal)")
+        }
+        return meal
+    }
 }

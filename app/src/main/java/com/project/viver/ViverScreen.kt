@@ -403,7 +403,9 @@ fun ViverApp(
                 )
             }
             composable(route = ViverScreen.NewList.name) {
-                NewListScreen()
+                NewListScreen(
+                    viewModel = viewModel
+                )
             }
 //                    composable(route = ViverScreen.EspecificList.name) {
 //                        EspecificListScreen(navController = navController)
