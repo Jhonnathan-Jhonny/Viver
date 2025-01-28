@@ -404,7 +404,11 @@ fun ViverApp(
             }
             composable(route = ViverScreen.NewList.name) {
                 NewListScreen(
-                    viewModel = viewModel
+                    viewModel = viewModel,
+                    context = context,
+                    //ALTERAÇÃO
+                    onConfirmButtonClicked = {navController.navigate(ViverScreen.Home.name)}, //Deve ir para as "Minhas listas"
+                    onCancelButtonClicked = {navController.navigate(ViverScreen.Home.name)}
                 )
             }
 //                    composable(route = ViverScreen.EspecificList.name) {

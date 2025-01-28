@@ -2,6 +2,8 @@
 
 package com.project.viver
 import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.LiveData
@@ -23,7 +25,6 @@ import io.ktor.util.InternalAPI
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-
 
 open class ViverViewModel : ViewModel() {
 
@@ -333,90 +334,178 @@ open class ViverViewModel : ViewModel() {
         _uiState.value = UserState.Loading
     }
 
-    private val foodDatabase = listOf(
-        // Proteínas
-        Food(name = "Frango grelhado", calories = 165, protein = 31.0, fat = 3.6, carbs = 0.0),
-        Food(name = "Peixe assado", calories = 206, protein = 22.0, fat = 12.0, carbs = 0.0),
-        Food(name = "Ovo cozido", calories = 155, protein = 13.0, fat = 11.0, carbs = 1.1),
-        // Gorduras
-        Food(name = "Abacate", calories = 160, protein = 2.0, fat = 15.0, carbs = 9.0),
-        Food(name = "Azeite de oliva", calories = 884, protein = 0.0, fat = 100.0, carbs = 0.0),
-        Food(name = "Castanhas", calories = 607, protein = 15.0, fat = 55.0, carbs = 20.0),
-        // Carboidratos
-        Food(name = "Arroz integral", calories = 112, protein = 2.6, fat = 0.9, carbs = 23.0),
-        Food(name = "Batata-doce", calories = 86, protein = 1.6, fat = 0.1, carbs = 20.0),
-        Food(name = "Quinoa", calories = 120, protein = 4.1, fat = 1.9, carbs = 21.3)
-    )
-
     val meal = mutableStateListOf<List<String>>()  // Alterando para uma lista de listas
     val totals = mutableStateMapOf<String, Double>()
+    private val usedFoods = mutableSetOf<String>()
 
-    // Função para gerar o plano alimentar
+
+    // Alimentos para lanches (manhã e tarde) divididos por categorias
+    private val snackProteins = listOf(
+        Food(name = "Iogurte natural", calories = 59, protein = 3.5, fat = 3.3, carbs = 4.7),
+        Food(name = "Queijo cottage", calories = 98, protein = 11.1, fat = 4.3, carbs = 3.4),
+        Food(name = "Ovo cozido", calories = 68, protein = 5.5, fat = 4.8, carbs = 0.6),
+        Food(name = "Peito de peru", calories = 104, protein = 18.0, fat = 1.0, carbs = 1.5),
+        Food(name = "Atum em água", calories = 128, protein = 26.0, fat = 1.0, carbs = 0.0),
+        Food(name = "Edamame", calories = 122, protein = 11.0, fat = 5.0, carbs = 9.0),
+        Food(name = "Leite de amêndoa", calories = 30, protein = 1.0, fat = 2.5, carbs = 1.0),
+        Food(name = "Proteína em pó (whey)", calories = 120, protein = 24.0, fat = 1.0, carbs = 3.0)
+    )
+
+    private val snackCarbs = listOf(
+        Food(name = "Banana", calories = 89, protein = 1.1, fat = 0.3, carbs = 23.0),
+        Food(name = "Maçã", calories = 52, protein = 0.3, fat = 0.2, carbs = 14.0),
+        Food(name = "Pão integral", calories = 69, protein = 2.7, fat = 1.1, carbs = 11.6),
+        Food(name = "Aveia", calories = 389, protein = 16.9, fat = 6.9, carbs = 66.3),
+        Food(name = "Granola", calories = 471, protein = 10.0, fat = 20.0, carbs = 64.0),
+        Food(name = "Manga", calories = 60, protein = 0.8, fat = 0.4, carbs = 15.0),
+        Food(name = "Uvas", calories = 69, protein = 0.7, fat = 0.2, carbs = 18.0),
+        Food(name = "Torrada integral", calories = 75, protein = 3.0, fat = 1.0, carbs = 12.0)
+    )
+
+    private val snackFats = listOf(
+        Food(name = "Castanhas", calories = 607, protein = 15.0, fat = 55.0, carbs = 20.0),
+        Food(name = "Amêndoas", calories = 576, protein = 21.1, fat = 49.9, carbs = 21.6),
+        Food(name = "Pasta de amendoim", calories = 588, protein = 25.1, fat = 50.4, carbs = 20.1),
+        Food(name = "Nozes", calories = 654, protein = 15.0, fat = 65.0, carbs = 14.0),
+        Food(name = "Sementes de girassol", calories = 584, protein = 21.0, fat = 51.0, carbs = 20.0),
+        Food(name = "Coco ralado", calories = 354, protein = 3.3, fat = 33.5, carbs = 15.0),
+        Food(name = "Azeitonas", calories = 115, protein = 0.8, fat = 11.0, carbs = 6.0),
+        Food(name = "Manteiga de amêndoa", calories = 614, protein = 21.0, fat = 56.0, carbs = 19.0)
+    )
+
+    // Alimentos para refeições principais (almoço e jantar) divididos por categorias
+    private val mainProteins = listOf(
+        Food(name = "Frango grelhado", calories = 165, protein = 31.0, fat = 3.6, carbs = 0.0),
+        Food(name = "Peixe assado", calories = 206, protein = 22.0, fat = 12.0, carbs = 0.0),
+        Food(name = "Carne bovina magra", calories = 250, protein = 26.0, fat = 15.0, carbs = 0.0),
+        Food(name = "Tofu", calories = 76, protein = 8.0, fat = 4.8, carbs = 1.9),
+        Food(name = "Salmão", calories = 208, protein = 20.0, fat = 13.0, carbs = 0.0),
+        Food(name = "Camarão", calories = 99, protein = 24.0, fat = 0.3, carbs = 0.2),
+        Food(name = "Lentilhas", calories = 116, protein = 9.0, fat = 0.4, carbs = 20.0),
+        Food(name = "Omelete de claras", calories = 52, protein = 11.0, fat = 0.2, carbs = 0.7)
+    )
+
+    private val mainCarbs = listOf(
+        Food(name = "Arroz integral", calories = 112, protein = 2.6, fat = 0.9, carbs = 23.0),
+        Food(name = "Batata-doce", calories = 86, protein = 1.6, fat = 0.1, carbs = 20.0),
+        Food(name = "Quinoa", calories = 120, protein = 4.1, fat = 1.9, carbs = 21.3),
+        Food(name = "Feijão preto", calories = 91, protein = 5.5, fat = 0.5, carbs = 16.0),
+        Food(name = "Massa integral", calories = 131, protein = 5.0, fat = 1.0, carbs = 25.0),
+        Food(name = "Cuscuz", calories = 112, protein = 3.8, fat = 0.2, carbs = 23.0),
+        Food(name = "Abóbora assada", calories = 49, protein = 1.0, fat = 0.2, carbs = 12.0),
+        Food(name = "Grão-de-bico", calories = 164, protein = 8.9, fat = 2.6, carbs = 27.0)
+    )
+
+    private val mainFats = listOf(
+        Food(name = "Azeite de oliva", calories = 119, protein = 0.0, fat = 13.5, carbs = 0.0),
+        Food(name = "Abacate", calories = 160, protein = 2.0, fat = 15.0, carbs = 9.0),
+        Food(name = "Sementes de chia", calories = 486, protein = 16.5, fat = 30.7, carbs = 42.1),
+        Food(name = "Manteiga ghee", calories = 112, protein = 0.0, fat = 12.7, carbs = 0.0),
+        Food(name = "Óleo de coco", calories = 121, protein = 0.0, fat = 13.5, carbs = 0.0),
+        Food(name = "Azeitonas pretas", calories = 145, protein = 1.0, fat = 15.0, carbs = 4.0),
+        Food(name = "Salmão (gordura natural)", calories = 208, protein = 20.0, fat = 13.0, carbs = 0.0),
+        Food(name = "Queijo feta", calories = 264, protein = 14.0, fat = 21.0, carbs = 4.0)
+    )
+
+    // Função para criar refeições com alimentos diversificados
+    private fun createMeal(protein: Double, fat: Double, carbs: Double, isSnack: Boolean): List<String> {
+        // Escolher o banco de dados correto
+        val proteins = if (isSnack) snackProteins else mainProteins
+        val carbsList = if (isSnack) snackCarbs else mainCarbs
+        val fats = if (isSnack) snackFats else mainFats
+
+        val selectedProteins = selectFood(proteins, protein, "protein") ?: "Sem proteína"
+        val selectedCarbs = selectFood(carbsList, carbs, "carb") ?: "Sem carboidrato"
+        val selectedFats = selectFood(fats, fat, "fat") ?: "Sem gordura"
+
+        return listOf(selectedProteins, selectedCarbs, selectedFats)
+    }
+
+    // Função para selecionar um alimento do grupo
+    private fun selectFood(foods: List<Food>, requiredGrams: Double, macronutrientType: String): String? {
+        val availableFoods = foods.filter { it.name !in usedFoods }
+        val food = availableFoods.shuffled().firstOrNull() ?: return null
+
+        val nutrientValue = when (macronutrientType) {
+            "protein" -> food.protein
+            "fat" -> food.fat
+            "carb" -> food.carbs
+            else -> 1.0
+        }
+
+        if (nutrientValue == 0.0) {
+            return null // Evitar divisão por zero
+        }
+
+        val portion = (requiredGrams / nutrientValue) * 100
+        val adjustedGrams = portion.coerceAtLeast(30.0).coerceAtMost(150.0)
+
+        usedFoods.add(food.name)
+        return "${food.name} - ${adjustedGrams.toInt()}g"
+    }
+
+    // Gerar o plano alimentar com lógica atualizada
     fun generateMealPlan(weight: Double, activityLevel: Double, calorieReduction: Int = 500) {
-        // 1. Calcular calorias diárias
+        usedFoods.clear() // Limpar alimentos usados
+
         val dailyCalories = (weight * 22 * activityLevel) - calorieReduction
+        val proteinGrams = weight * 2
+        val fatGrams = weight * 0.8
+        val carbGrams = (dailyCalories - (proteinGrams * 4 + fatGrams * 9)) / 4
 
-        // 2. Calcular macronutrientes
-        val proteinGrams = weight * 2 // 2g de proteína por kg
-        val fatGrams = weight * 0.8 // Média de 0.8g de gordura por kg
-        val proteinCalories = proteinGrams * 4
-        val fatCalories = fatGrams * 9
-        val carbCalories = dailyCalories - (proteinCalories + fatCalories)
-        val carbGrams = carbCalories / 4
+        val morningSnack = createMeal(proteinGrams / 10, fatGrams / 10, carbGrams / 5, isSnack = true)
+        val lunch = createMeal(proteinGrams / 3, fatGrams / 3, carbGrams / 3, isSnack = false)
+        val afternoonSnack = createMeal(proteinGrams / 10, fatGrams / 10, carbGrams / 5, isSnack = true)
+        val dinner = createMeal(proteinGrams / 3, fatGrams / 3, carbGrams / 3, isSnack = false)
 
-        // 3. Criar refeições baseadas nos alimentos disponíveis
-        val morningSnack = createMeal(proteinGrams / 4, fatGrams / 4, carbGrams / 4)
-        val lunch = createMeal(proteinGrams / 4, fatGrams / 4, carbGrams / 4)
-        val afternoonSnack = createMeal(proteinGrams / 4, fatGrams / 4, carbGrams / 4)
-        val dinner = createMeal(proteinGrams / 4, fatGrams / 4, carbGrams / 4)
-
-        // 4. Adicionar as refeições ao estado (agora uma lista de listas)
         meal.clear()
         meal.addAll(listOf(morningSnack, lunch, afternoonSnack, dinner))
 
-        // 5. Adicionar totais de macronutrientes
         totals["calories"] = dailyCalories
         totals["protein"] = proteinGrams
         totals["fat"] = fatGrams
         totals["carbs"] = carbGrams
     }
 
-    // Função para criar uma refeição com alimentos selecionados
-    fun createMeal(protein: Double, fat: Double, carbs: Double): List<String> {
-        val selectedProteins = selectFoods(foodDatabase.filter { it.protein > 10 }, protein, "protein")
-        val selectedFats = selectFoods(foodDatabase.filter { it.fat > 5 }, fat, "fat")
-        val selectedCarbs = selectFoods(foodDatabase.filter { it.carbs > 10 }, carbs, "carb")
-
-        return selectedProteins + selectedFats + selectedCarbs
-    }
-
-    // Função para selecionar alimentos com base na quantidade de macronutrientes necessária
-    private fun selectFoods(foods: List<Food>, requiredGrams: Double, macronutrientType: String): List<String> {
-        val meal = mutableListOf<String>()
-        var remainingGrams = requiredGrams
-
-        for (food in foods) {
-            if (remainingGrams <= 0) break
-            // A porção será baseada no tipo de macronutriente
-            val portion = (remainingGrams / when(macronutrientType) {
-                "protein" -> food.protein
-                "fat" -> food.fat
-                "carb" -> food.carbs
-                else -> 1.0
-            }).coerceAtMost(100.0) // Limitar a porção a 100g por alimento
-
-            remainingGrams -= when(macronutrientType) {
-                "protein" -> food.protein * (portion / 100)
-                "fat" -> food.fat * (portion / 100)
-                "carb" -> food.carbs * (portion / 100)
-                else -> 0.0
+    fun saveMealPlanToDatabase(mealPlan: List<List<String>>, totals: Map<String, Double>, context: Context) {
+        viewModelScope.launch {
+            _uiState.value = UserState.Loading
+            val token = getToken(context)
+            if (token.isNullOrEmpty()) {
+                _uiState.value = UserState.Error("Token não encontrado.")
+                Toast.makeText(context, "Token não encontrado.", Toast.LENGTH_LONG).show()
+                return@launch
             }
 
-            // Exibir apenas o nome do alimento e a quantidade em gramas
-            meal.add("${food.name} - ${portion.toInt()}g")
+            // Recuperando o usuário autenticado e seu email
+            val user = supabase.auth.retrieveUser(token)
+            if (user.id.isEmpty()) {
+                _uiState.value = UserState.Error("ID do usuário não encontrado.")
+                Toast.makeText(context, "ID do usuário não encontrado.", Toast.LENGTH_LONG).show()
+                return@launch
+            }
+
+            try {
+                supabase
+                    .from("userDailyMeals")  // Nome da tabela do banco de dados
+                    .insert(
+                        mapOf(
+                            "name_meals" to "Plano Alimentar",
+                            "user_id" to user.id,
+                            "breakfast" to mealPlan[0].joinToString(","),
+                            "lunch" to mealPlan[1].joinToString(","),
+                            "afternoonSnack" to mealPlan[2].joinToString(","),
+                            "dinner" to mealPlan[3].joinToString(",")
+                        )
+                    )  // Inserir os dados
+
+                    _uiState.value = UserState.Success("Plano alimentar salvo com sucesso!")
+                    Toast.makeText(context, "Plano alimentar salvo com sucesso!", Toast.LENGTH_LONG).show()
+            } catch (e: Exception) {
+                _uiState.value = UserState.Error("Erro ao salvar o plano alimentar: ${e.message}")
+                Toast.makeText(context, "Erro ao salvar o plano alimentar: ${e.message}", Toast.LENGTH_LONG).show()
+                Log.e("Minha pica:", "Erro ao salvar plano alimentar", e)
+            }
         }
-
-        return meal
     }
-
 }

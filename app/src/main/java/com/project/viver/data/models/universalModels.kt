@@ -151,6 +151,7 @@ fun SingleButton(
 fun DoubleButton(
     onClickCancel: () -> Unit,
     onClickConfirm: () -> Unit,
+    nameConfirmButton: String = stringResource(id = R.string.continuar),
     isLoading: Boolean,
 ) {
     Row (
@@ -210,7 +211,7 @@ fun DoubleButton(
                 )
             } else {
                 Text(
-                    text = stringResource(id = R.string.continuar),
+                    text = nameConfirmButton,
                     color = Color.White,
                     fontSize = 22.sp,
                 )
@@ -224,8 +225,6 @@ fun DoubleButton(
 @Composable
 fun Preview() {
     TextBox(value = "", onValueChange = {}, label = "Email")
-//    SingleButton(onClick = { /*TODO*/ }, isLoading = true, buttonName = "Login", colorResource(id = R.color.First), colorResource(id = R.color.First))
-//    DoubleButton(onClickCancel = { /*TODO*/ }, onClickConfirm = { /*TODO*/ }, isLoading = false)
 }
 
 

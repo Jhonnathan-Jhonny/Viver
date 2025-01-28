@@ -7,3 +7,4 @@ data class Food(
     val fat: Double,
     val carbs: Double
 )
+

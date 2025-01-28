@@ -55,7 +55,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.navigation.compose.rememberNavController
 import com.project.viver.R
 import com.project.viver.ViverScreen
 import com.project.viver.ViverViewModel
@@ -115,7 +114,7 @@ fun ProfileScreen(
                     context = context,
                     onEditPasswordButtonClicked = onEditPasswordButtonClicked,
                     onDeleteActionConfirmedButtonClicked = onDeleteActionConfirmedButtonClicked,
-
+                    viewModel = viewModel
                 )
             }
         }
@@ -127,7 +126,7 @@ fun ProfileScreen(
 fun ProfileContent(
     userProfile: OrderUiStateUser?,
     onEditPasswordButtonClicked: () -> Unit,
-    viewModel: ViverViewModel = ViverViewModel(),
+    viewModel: ViverViewModel,
     context: Context,
     onDeleteActionConfirmedButtonClicked: () -> Unit
 ) {
@@ -571,14 +570,13 @@ fun GenderRadioButton(
 @Preview(showBackground = true)
 @Composable
 fun ProfileScreenPreview() {
-    val navController = rememberNavController()
     ProfileContent(
         userProfile = OrderUiStateUser(
             name = "Jhonnathan",
         surname = "Rodrigues", sex = "M"),
         onEditPasswordButtonClicked = { ViverScreen.ConfirmPassword.name},
         context = LocalContext.current,
-        onDeleteActionConfirmedButtonClicked = { }
+        onDeleteActionConfirmedButtonClicked = { },
+        viewModel = ViverViewModel()
     )
-//    ProfileScreen(ViverViewModel(),navController.context) { ViverScreen.Profile }
 }
