@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -46,20 +47,27 @@ import com.project.viver.data.models.UserState
 fun ListsScreen(
     viewModel: ViverViewModel,
     context: Context,
-    onMealPlanClicked: (MealPlan) -> Unit // Callback para quando um plano for clicado
+    onMealPlanClicked: (MealPlan) -> Unit
 ) {
     val mealPlans = viewModel.mealPlans
     val uiState by viewModel.uiState.collectAsState()
 
-    // Dispara a busca dos planos alimentares ao iniciar a tela
     LaunchedEffect(Unit) {
         viewModel.fetchMealPlans(context)
     }
 
-    // Exibe o estado da UI (carregando, erro, etc.)
     when (uiState) {
         is UserState.Loading -> {
-            CircularProgressIndicator()
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.White),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    color = colorResource(id = R.color.First),
+                )
+            }
         }
         is UserState.Error -> {
             Text(
@@ -69,7 +77,7 @@ fun ListsScreen(
             )
         }
         else -> {
-            Box (
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(colorResource(id = R.color.First))
@@ -79,7 +87,7 @@ fun ListsScreen(
                             topEnd = 32.dp,
                         )
                     )
-            ){
+            ) {
                 Surface(
                     modifier = Modifier
                         .fillMaxSize()
@@ -87,7 +95,25 @@ fun ListsScreen(
                         .statusBarsPadding(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MealPlansGrid(mealPlans = mealPlans, onMealPlanClicked = onMealPlanClicked)
+                    if (mealPlans.isNotEmpty()) {
+                        MealPlansGrid(
+                            mealPlans = mealPlans,
+                            onMealPlanClicked = onMealPlanClicked // Passando a função corretamente
+                        )
+                    } else {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.White),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = stringResource(R.string.vazio),
+                                color = colorResource(id = R.color.Third),
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -122,36 +148,42 @@ fun MealPlanCard(mealPlan: MealPlan, onClick: () -> Unit) {
             .clickable { onClick() } ,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Row(
+        Box(
             modifier = Modifier
-                .background(colorResource(id = R.color.Second))
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxSize() // Para garantir que a transparência fique sobre um fundo fixo
+                .background(Color.White) // Fundo branco fixo, evitando interferência do modo escuro
         ) {
-            // Ícone de imagem (substitua pelo seu ícone ou imagem)
-            Icon(
-                imageVector = Icons.Default.Fastfood,
-                contentDescription = null,
+            Row(
                 modifier = Modifier
-                    .size(48.dp)
-                    .padding(end = 8.dp),
-                tint = colorResource(id = R.color.First)
-            )
-            Column {
-                // Nome do plano alimentar
-                Text(
-                    text = mealPlan.name_meals,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 4.dp),
-                    color = Color.Black
+                    .background(Color(0x4DA8D5BA)) // Cor com transparência aplicada corretamente
+                    .padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Ícone de imagem (substitua pelo seu ícone ou imagem)
+                Icon(
+                    imageVector = Icons.Default.Fastfood,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .padding(end = 8.dp),
+                    tint = colorResource(id = R.color.First)
                 )
-                // Data de criação
-                Text(
-                    text = "Criado em: ${mealPlan.created_at}",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = Color.Gray
-                )
+                Column {
+                    // Nome do plano alimentar
+                    Text(
+                        text = mealPlan.name_meals,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 4.dp),
+                        color = Color.Black
+                    )
+                    // Data de criação
+                    Text(
+                        text = "Criado em: ${mealPlan.created_at}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.Gray
+                    )
+                }
             }
         }
     }

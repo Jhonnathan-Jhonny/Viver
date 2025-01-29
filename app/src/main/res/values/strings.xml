@@ -25,4 +25,5 @@
     <string name="cancelar">Cancelar</string>
     <string name="continuar">Continuar</string>
     <string name="nova_senha">Nova senha</string>
+    <string name="vazio">Vazio</string>
 </resources>
