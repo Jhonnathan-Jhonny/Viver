@@ -47,6 +47,7 @@ import com.project.viver.ui.ForgotPasswordScreen
 import com.project.viver.ui.HomeScreen
 import com.project.viver.ui.InformationForNewListScreen
 import com.project.viver.ui.InitialLogoScreen
+import com.project.viver.ui.ListsScreen
 import com.project.viver.ui.LoginScreen
 import com.project.viver.ui.NewListScreen
 import com.project.viver.ui.NewPasswordScreen
@@ -406,16 +407,22 @@ fun ViverApp(
                 NewListScreen(
                     viewModel = viewModel,
                     context = context,
-                    //ALTERAÇÃO
-                    onConfirmButtonClicked = {navController.navigate(ViverScreen.Home.name)}, //Deve ir para as "Minhas listas"
+                    onConfirmButtonClicked = {navController.navigate(ViverScreen.Lists.name){
+                        popUpTo(ViverScreen.NewList.name) { inclusive = true }
+                        popUpTo(ViverScreen.InformationForNewList.name) { inclusive = true }
+                    } },
                     onCancelButtonClicked = {navController.navigate(ViverScreen.Home.name)}
+                )
+            }
+            composable(route = ViverScreen.Lists.name) {
+                ListsScreen(
+                    viewModel = viewModel,
+                    context = context,
+                    onMealPlanClicked = {  }
                 )
             }
 //                    composable(route = ViverScreen.EspecificList.name) {
 //                        EspecificListScreen(navController = navController)
-//                    }
-//                    composable(route = ViverScreen.Lists.name) {
-//                        ListsScreen(navController = navController)
 //                    }
         }
     }

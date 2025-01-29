@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -34,8 +35,8 @@ open class ViverViewModel : ViewModel() {
     private val _userProfile = MutableLiveData<OrderUiStateUser>()
     val userProfile: LiveData<OrderUiStateUser> = _userProfile
 
-    private val _mealPlan = MutableStateFlow<MealPlan?>(null)
-    val mealPlan: StateFlow<MealPlan?> = _mealPlan
+    private val _mealPlans = mutableStateListOf<MealPlan>()
+    val mealPlans: SnapshotStateList<MealPlan> get() = _mealPlans
 
     private fun saveToken(context: Context) {
         viewModelScope.launch {
@@ -415,10 +416,21 @@ open class ViverViewModel : ViewModel() {
         val fats = if (isSnack) snackFats else mainFats
 
         val selectedProteins = selectFood(proteins, protein, "protein") ?: "Sem proteína"
-        val selectedCarbs = selectFood(carbsList, carbs, "carb") ?: "Sem carboidrato"
         val selectedFats = selectFood(fats, fat, "fat") ?: "Sem gordura"
 
-        return listOf(selectedProteins, selectedCarbs, selectedFats)
+        // Selecionar carboidratos
+        val selectedCarbs = if (isSnack) {
+            // Para lanches, selecionar apenas um carboidrato
+            listOf(selectFood(carbsList, carbs, "carb") ?: "Sem carboidrato")
+        } else {
+            // Para refeições principais, selecionar dois carboidratos
+            val carb1 = selectFood(carbsList, carbs / 2, "carb") ?: "Sem carboidrato 1"
+            val carb2 = selectFood(carbsList, carbs / 2, "carb") ?: "Sem carboidrato 2"
+            listOf(carb1, carb2)
+        }
+
+        // Retornar a lista de alimentos selecionados
+        return listOf(selectedProteins) + selectedCarbs + listOf(selectedFats)
     }
 
     // Função para selecionar um alimento do grupo
@@ -453,11 +465,13 @@ open class ViverViewModel : ViewModel() {
         val fatGrams = weight * 0.8
         val carbGrams = (dailyCalories - (proteinGrams * 4 + fatGrams * 9)) / 4
 
+        // Divisão em lanches e refeições principais
         val morningSnack = createMeal(proteinGrams / 10, fatGrams / 10, carbGrams / 5, isSnack = true)
         val lunch = createMeal(proteinGrams / 3, fatGrams / 3, carbGrams / 3, isSnack = false)
         val afternoonSnack = createMeal(proteinGrams / 10, fatGrams / 10, carbGrams / 5, isSnack = true)
         val dinner = createMeal(proteinGrams / 3, fatGrams / 3, carbGrams / 3, isSnack = false)
 
+        // Atualizar as variáveis globais
         meal.clear()
         meal.addAll(listOf(morningSnack, lunch, afternoonSnack, dinner))
 
@@ -467,7 +481,7 @@ open class ViverViewModel : ViewModel() {
         totals["carbs"] = carbGrams
     }
 
-    fun saveMealPlanToDatabase(mealPlan: List<List<String>>, totals: Map<String, Double>, context: Context) {
+    fun saveMealPlanToDatabase(mealPlan: List<List<String>>, mealPlanName:String, context: Context) {
         viewModelScope.launch {
             _uiState.value = UserState.Loading
             val token = getToken(context)
@@ -490,14 +504,14 @@ open class ViverViewModel : ViewModel() {
                     .from("userDailyMeals")  // Nome da tabela do banco de dados
                     .insert(
                         mapOf(
-                            "name_meals" to "Plano Alimentar",
+                            "name_meals" to mealPlanName,
                             "user_id" to user.id,
                             "breakfast" to mealPlan[0].joinToString(","),
                             "lunch" to mealPlan[1].joinToString(","),
                             "afternoonSnack" to mealPlan[2].joinToString(","),
                             "dinner" to mealPlan[3].joinToString(",")
                         )
-                    )  // Inserir os dados
+                    )
 
                     _uiState.value = UserState.Success("Plano alimentar salvo com sucesso!")
                     Toast.makeText(context, "Plano alimentar salvo com sucesso!", Toast.LENGTH_LONG).show()
@@ -505,6 +519,41 @@ open class ViverViewModel : ViewModel() {
                 _uiState.value = UserState.Error("Erro ao salvar o plano alimentar: ${e.message}")
                 Toast.makeText(context, "Erro ao salvar o plano alimentar: ${e.message}", Toast.LENGTH_LONG).show()
                 Log.e("Minha pica:", "Erro ao salvar plano alimentar", e)
+            }
+        }
+    }
+
+    fun fetchMealPlans(context: Context) {
+        viewModelScope.launch {
+            _uiState.value = UserState.Loading
+            val token = getToken(context)
+            if (token.isNullOrEmpty()) {
+                _uiState.value = UserState.Error("Token não encontrado.")
+                return@launch
+            }
+
+            val user = supabase.auth.retrieveUser(token)
+            if (user.id.isEmpty()) {
+                _uiState.value = UserState.Error("ID do usuário não encontrado.")
+                return@launch
+            }
+
+            try {
+                val mealPlans = supabase
+                    .from("userDailyMeals")
+                    .select(){
+                        filter {
+                            eq("user_id", user.id)
+                        }
+                    }
+                    .decodeList<MealPlan>()
+
+                _mealPlans.clear()
+                _mealPlans.addAll(mealPlans)
+                _uiState.value = UserState.Success("Planos alimentares carregados com sucesso!")
+            } catch (e: Exception) {
+                _uiState.value = UserState.Error("Erro ao buscar planos alimentares: ${e.message}")
+                Log.e("ViverViewModel", "Erro ao buscar planos alimentares", e)
             }
         }
     }
