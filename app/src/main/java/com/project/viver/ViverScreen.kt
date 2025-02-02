@@ -1,5 +1,3 @@
-@file:Suppress("UNUSED_EXPRESSION")
-
 package com.project.viver
 
 import android.content.Context
@@ -37,12 +35,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.project.viver.ui.ConfirmPasswordScreen
 import com.project.viver.ui.EditedPasswordSuccessfullyScreen
 import com.project.viver.ui.ForgotPasswordScreen
@@ -76,6 +72,9 @@ enum class ViverScreen {
     ValidateEmail,
     Transition
 }
+
+
+
 
 @Composable
 fun ViverAppTopBar1(
@@ -229,7 +228,6 @@ fun ViverAppTopBar2(
                             popUpTo(ViverScreen.Home.name) { inclusive = true }
                         }
                     } else {
-                        // Volta para a tela anterior
                         navController.navigateUp()
                     }
                 },
@@ -421,18 +419,11 @@ fun ViverApp(
                 ListsScreen(
                     viewModel = viewModel,
                     context = context,
-                    onMealPlanClicked = { mealPlan ->
-                        navController.navigate("${ViverScreen.SpecificList.name}/${mealPlan.id}")
-                    }
+                    navController = navController
                 )
             }
-            composable(
-                route = "${ViverScreen.SpecificList.name}/{mealPlanId}",
-                arguments = listOf(navArgument("mealPlanId") { type = NavType.IntType })
-            ) { backStackEntry ->
-                val mealPlanId = backStackEntry.arguments?.getInt("mealPlanId")
-                val mealPlan = viewModel.mealPlans.find { it.id == mealPlanId }
-                SpecificListScreen(mealPlan = mealPlan)
+            composable(route = ViverScreen.SpecificList.name) {
+                SpecificListScreen(viewModel = viewModel)
             }
         }
     }

@@ -38,6 +38,9 @@ open class ViverViewModel : ViewModel() {
     private val _mealPlans = mutableStateListOf<MealPlan>()
     val mealPlans: SnapshotStateList<MealPlan> get() = _mealPlans
 
+    private val _mealPlan = MutableLiveData<MealPlan?>()
+    val mealPlan: LiveData<MealPlan?> = _mealPlan
+
     private fun saveToken(context: Context) {
         viewModelScope.launch {
             val accessToken = supabase.auth.currentAccessTokenOrNull()
@@ -557,4 +560,24 @@ open class ViverViewModel : ViewModel() {
             }
         }
     }
+
+    fun getMealPlanById(id: Int, context: Context) {
+        viewModelScope.launch {
+            _uiState.value = UserState.Loading
+            try {
+                val mealPlan = _mealPlans.find { it.id == id }
+                if (mealPlan != null) {
+                    _uiState.value = UserState.Success("Dados encontrados")
+                    _mealPlan.value = mealPlan
+                } else {
+                    _uiState.value = UserState.Error("Dados não encontrados")
+                    Toast.makeText(context, "Dados não encontrados", Toast.LENGTH_LONG).show()
+                }
+            } catch (e: Exception) {
+                _uiState.value = UserState.Error("Erro ao buscar dados: ${e.message}")
+                Toast.makeText(context, "Erro ao buscar dados: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
 }

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -20,7 +21,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fastfood
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -33,21 +33,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.project.viver.R
+import com.project.viver.ViverScreen
 import com.project.viver.ViverViewModel
+import com.project.viver.data.models.LoadingIndicator
 import com.project.viver.data.models.MealPlan
 import com.project.viver.data.models.UserState
+
 
 @Composable
 fun ListsScreen(
     viewModel: ViverViewModel,
     context: Context,
-    onMealPlanClicked: (MealPlan) -> Unit
+    navController: NavController
 ) {
     val mealPlans = viewModel.mealPlans
     val uiState by viewModel.uiState.collectAsState()
@@ -61,12 +66,9 @@ fun ListsScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.White),
-                contentAlignment = Alignment.Center
+                    .wrapContentSize(Alignment.Center)
             ) {
-                CircularProgressIndicator(
-                    color = colorResource(id = R.color.First),
-                )
+                LoadingIndicator()
             }
         }
         is UserState.Error -> {
@@ -77,6 +79,7 @@ fun ListsScreen(
             )
         }
         else -> {
+
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -95,25 +98,12 @@ fun ListsScreen(
                         .statusBarsPadding(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    if (mealPlans.isNotEmpty()) {
-                        MealPlansGrid(
-                            mealPlans = mealPlans,
-                            onMealPlanClicked = onMealPlanClicked // Passando a função corretamente
-                        )
-                    } else {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(Color.White),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = stringResource(R.string.vazio),
-                                color = colorResource(id = R.color.Third),
-                            )
-                        }
-                    }
+                    MealPlansGrid(
+                        mealPlans = mealPlans,
+                        navController = navController,
+                        viewModel = viewModel,
+                        context = context
+                    )
                 }
             }
         }
@@ -123,8 +113,10 @@ fun ListsScreen(
 @Composable
 fun MealPlansGrid(
     mealPlans: List<MealPlan>,
-    onMealPlanClicked: (MealPlan) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    viewModel: ViverViewModel,
+    context: Context
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -134,56 +126,71 @@ fun MealPlansGrid(
             .background(Color.White)
             .padding(8.dp)
     ) {
+
         items(mealPlans) { mealPlan ->
-            MealPlanCard(mealPlan = mealPlan, onClick = { onMealPlanClicked(mealPlan) })
+            MealPlanCard(
+                mealPlan = mealPlan,
+                navController = navController,
+                viewModel = viewModel,
+                context = context
+            )
         }
     }
 }
 
 @Composable
-fun MealPlanCard(mealPlan: MealPlan, onClick: () -> Unit) {
+fun MealPlanCard(
+    mealPlan: MealPlan,
+    navController: NavController,
+    viewModel: ViverViewModel,
+    context: Context
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    LaunchedEffect(uiState) {
+        if (uiState is UserState.Success) {
+            val successMessage = (uiState as UserState.Success).message
+            if (successMessage == "Dados encontrados") {
+                navController.navigate(ViverScreen.SpecificList.name) {
+                    popUpTo(ViverScreen.Lists.name) { inclusive = false }
+                }
+            }
+        }
+    }
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() } ,
+            .clickable {
+                viewModel.getMealPlanById(id = mealPlan.id, context = context)
+            },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Box(
+        Row(
             modifier = Modifier
-                .fillMaxSize() // Para garantir que a transparência fique sobre um fundo fixo
-                .background(Color.White) // Fundo branco fixo, evitando interferência do modo escuro
+                .background(Color(0xFFD1E0D7))
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
+            Icon(
+                imageVector = Icons.Default.Fastfood,
+                contentDescription = null,
                 modifier = Modifier
-                    .background(Color(0x4DA8D5BA)) // Cor com transparência aplicada corretamente
-                    .padding(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Ícone de imagem (substitua pelo seu ícone ou imagem)
-                Icon(
-                    imageVector = Icons.Default.Fastfood,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(48.dp)
-                        .padding(end = 8.dp),
-                    tint = colorResource(id = R.color.First)
+                    .size(48.dp)
+                    .padding(end = 8.dp),
+                tint = colorResource(id = R.color.First)
+            )
+            Column {
+                Text(
+                    text = mealPlan.name_meals,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 4.dp),
+                    color = Color.Black
                 )
-                Column {
-                    // Nome do plano alimentar
-                    Text(
-                        text = mealPlan.name_meals,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 4.dp),
-                        color = Color.Black
-                    )
-                    // Data de criação
-                    Text(
-                        text = "Criado em: ${mealPlan.created_at}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color.Gray
-                    )
-                }
+                Text(
+                    text = "Criado em: ${mealPlan.created_at}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.Gray
+                )
             }
         }
     }
@@ -203,6 +210,8 @@ fun MealPlanCardPreview() {
             afternoonSnack = "Iogurte com frutas",
             dinner = "Sopa de legumes"
         ),
-        onClick = {}
+        navController = NavController(LocalContext.current),
+        viewModel = viewModel(),
+        context = LocalContext.current
     )
 }
