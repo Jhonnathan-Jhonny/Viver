@@ -6,9 +6,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -18,7 +19,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Fastfood
+import androidx.compose.material.icons.outlined.RestaurantMenu
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -32,10 +33,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -46,6 +50,8 @@ import com.project.viver.ViverViewModel
 import com.project.viver.data.models.LoadingIndicator
 import com.project.viver.data.models.MealPlan
 import com.project.viver.data.models.UserState
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 @Composable
@@ -118,22 +124,37 @@ fun MealPlansGrid(
     viewModel: ViverViewModel,
     context: Context
 ) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    Column(
         modifier = modifier
             .background(Color.White)
-            .padding(8.dp)
     ) {
+        Text(
+            text = "Meus Planos",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            textAlign = TextAlign.Center
+        )
 
-        items(mealPlans) { mealPlan ->
-            MealPlanCard(
-                mealPlan = mealPlan,
-                navController = navController,
-                viewModel = viewModel,
-                context = context
-            )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(mealPlans) { mealPlan ->
+                MealPlanCard(
+                    mealPlan = mealPlan,
+                    navController = navController,
+                    viewModel = viewModel,
+                    context = context
+                )
+            }
         }
     }
 }
@@ -146,6 +167,7 @@ fun MealPlanCard(
     context: Context
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
     LaunchedEffect(uiState) {
         if (uiState is UserState.Success) {
             val successMessage = (uiState as UserState.Success).message
@@ -156,39 +178,63 @@ fun MealPlanCard(
             }
         }
     }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .height(150.dp)
             .clickable {
                 viewModel.getMealPlanById(id = mealPlan.id, context = context)
-            },
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            }
+            .padding(8.dp) // Espaçamento externo
+            .shadow(
+                elevation = 8.dp,
+                shape = RoundedCornerShape(16.dp),
+                clip = true
+            ),
+        shape = RoundedCornerShape(16.dp), // Bordas arredondadas
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFE8F5E9) // Cor de fundo suave
+        )
     ) {
-        Row(
+        Column(
             modifier = Modifier
-                .background(Color(0xFFD1E0D7))
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxSize()
+                .background(
+                    brush = Brush.linearGradient(
+                        colors = listOf(
+                            Color(0xFFD1E0D7),
+                            Color(0xFFE8F5E9)
+                        )
+                    )
+                )
+                .padding(16.dp), // Espaçamento interno
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
+            // Ícone
             Icon(
-                imageVector = Icons.Default.Fastfood,
+                imageVector = Icons.Outlined.RestaurantMenu,
                 contentDescription = null,
                 modifier = Modifier
-                    .size(48.dp)
-                    .padding(end = 8.dp),
+                    .size(56.dp) // Ícone maior
+                    .padding(end = 16.dp), // Espaçamento à direita
                 tint = colorResource(id = R.color.First)
             )
+
+            // Textos
             Column {
                 Text(
                     text = mealPlan.name_meals,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.titleMedium, // Texto maior
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 4.dp),
-                    color = Color.Black
+                    color = Color.Black,
+                    modifier = Modifier.padding(bottom = 4.dp)
                 )
                 Text(
-                    text = "Criado em: ${mealPlan.created_at}",
-                    style = MaterialTheme.typography.labelSmall,
+                    text = formatDateTime(mealPlan.created_at),
+                    style = MaterialTheme.typography.bodySmall,
                     color = Color.Gray
                 )
             }
@@ -196,22 +242,20 @@ fun MealPlanCard(
     }
 }
 
+fun formatDateTime(dateTime: String): String {
+    return try {
+        val parser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+        val formatter = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+        val date = parser.parse(dateTime)
+        formatter.format(date ?: dateTime)
+    } catch (e: Exception) {
+        dateTime
+    }
+}
+
+
 @Preview(showBackground = true)
 @Composable
 fun MealPlanCardPreview() {
-    MealPlanCard(
-        mealPlan = MealPlan(
-            id = 1,
-            name_meals = "Dieta Balanceada",
-            created_at = "2024-01-29",
-            user_id = "123",
-            breakfast = "Omelete e suco de laranja",
-            lunch = "Frango grelhado com arroz e salada",
-            afternoonSnack = "Iogurte com frutas",
-            dinner = "Sopa de legumes"
-        ),
-        navController = NavController(LocalContext.current),
-        viewModel = viewModel(),
-        context = LocalContext.current
-    )
+    ListsScreen(viewModel = viewModel(), context = LocalContext.current, navController = NavController(LocalContext.current))
 }

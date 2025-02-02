@@ -65,6 +65,7 @@ fun SpecificListScreen(
     viewModel: ViverViewModel,
     context: Context
 ) {
+
     val mealPlan = viewModel.mealPlan.value
     var isEditing by remember { mutableStateOf(false) }
     val showDeleteDialog = remember { mutableStateOf(false) }
@@ -143,7 +144,7 @@ fun SpecificListScreen(
 
                         // Botão de salvar
                         IconButton(onClick = {
-                            if (mealPlan.name_meals.isBlank()) {
+                            if (mealPlanName.isBlank()) {
                                 mealPlanName = mealPlan.name_meals // Mantém o nome padrão se estiver vazio
                                 Toast.makeText(context, "Nome não pode ser vazio!", Toast.LENGTH_LONG).show()
                                 isEditing = false
