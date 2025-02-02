@@ -218,13 +218,15 @@ fun MealPlanCard(
                 imageVector = Icons.Outlined.RestaurantMenu,
                 contentDescription = null,
                 modifier = Modifier
-                    .size(56.dp) // Ícone maior
-                    .padding(end = 16.dp), // Espaçamento à direita
+                    .size(56.dp), // Ícone maior
                 tint = colorResource(id = R.color.First)
             )
 
             // Textos
-            Column {
+            Column (
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
                 Text(
                     text = mealPlan.name_meals,
                     style = MaterialTheme.typography.titleMedium, // Texto maior
@@ -257,5 +259,16 @@ fun formatDateTime(dateTime: String): String {
 @Preview(showBackground = true)
 @Composable
 fun MealPlanCardPreview() {
-    ListsScreen(viewModel = viewModel(), context = LocalContext.current, navController = NavController(LocalContext.current))
+    val sampleMealPlan = MealPlan(
+        id = 1,
+        name_meals = "Plano Alimentar Exemplo",
+        created_at = "2024-01-29",
+        user_id = "12345",
+        breakfast = "Pão integral, café e frutas",
+        lunch = "Arroz, feijão, frango grelhado e salada",
+        afternoonSnack = "Iogurte natural com granola",
+        dinner = "Sopa de legumes com torradas"
+    )
+//    ListsScreen(viewModel = viewModel(), context = LocalContext.current, navController = NavController(LocalContext.current))
+    MealPlanCard(mealPlan = sampleMealPlan, navController = NavController(LocalContext.current), viewModel = viewModel(), context = LocalContext.current)
 }
