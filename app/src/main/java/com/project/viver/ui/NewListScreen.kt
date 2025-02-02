@@ -69,17 +69,13 @@ fun NewListScreen(
         }
     }
     val meal = viewModel.meal
-    val totals by remember { mutableStateOf(viewModel.totals) }
+//    val totals by remember { mutableStateOf(viewModel.totals) }
     val userProfile by remember { mutableStateOf(viewModel.userProfile) }
     var mealPlanName by remember { mutableStateOf("Plano Alimentar") }
     var isEditing by remember { mutableStateOf(false) }
 
-
     val weight = userProfile.value!!.weight
     val activityLevel = userProfile.value!!.physical_activity_level
-
-//    val weight = 70.0
-//    val activityLevel = "Ativo"
 
     LaunchedEffect(Unit) {
         viewModel.generateMealPlan(

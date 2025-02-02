@@ -423,7 +423,16 @@ fun ViverApp(
                 )
             }
             composable(route = ViverScreen.SpecificList.name) {
-                SpecificListScreen(viewModel = viewModel)
+                SpecificListScreen(
+                    onDeleteActionConfirmedButtonClicked = {
+                        navController.navigate(ViverScreen.Lists.name){
+                                 popUpTo(ViverScreen.SpecificList.name) { inclusive = true }
+                                 popUpTo(ViverScreen.Lists.name) { inclusive = true }
+                            }
+                        },
+                    viewModel = viewModel,
+                    context = context
+                )
             }
         }
     }

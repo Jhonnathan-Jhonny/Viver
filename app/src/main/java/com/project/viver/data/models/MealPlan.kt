@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MealPlan(
     val id: Int,
-    val name_meals: String,
+    var name_meals: String,
     val created_at: String,
     val user_id: String,
     val breakfast: String,

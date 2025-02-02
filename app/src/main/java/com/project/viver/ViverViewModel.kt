@@ -339,7 +339,7 @@ open class ViverViewModel : ViewModel() {
     }
 
     val meal = mutableStateListOf<List<String>>()  // Alterando para uma lista de listas
-    val totals = mutableStateMapOf<String, Double>()
+    private val totals = mutableStateMapOf<String, Double>()
     private val usedFoods = mutableSetOf<String>()
 
 
@@ -580,4 +580,43 @@ open class ViverViewModel : ViewModel() {
         }
     }
 
+    fun updateNameMealPlan(NewName: String,id: Int, context: Context) {
+        viewModelScope.launch {
+            try {
+                supabase
+                    .from("userDailyMeals")
+                    .update(
+                        mapOf("name_meals" to NewName)
+                    ) {
+                        filter {
+                            eq("id", id)
+                        }
+                    }
+                Toast.makeText(context, "Nome alterado com sucesso!", Toast.LENGTH_LONG).show()
+            }
+            catch (e: Exception) {
+                _uiState.value = UserState.Error("Erro ao buscar dados: ${e.message}")
+                Toast.makeText(context, "Erro ao buscar dados: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    fun deleteMealPlan(id: Int, context: Context) {
+        viewModelScope.launch {
+            try {
+                supabase
+                    .from("userDailyMeals")
+                    .delete {
+                        filter {
+                            eq("id", id)
+                        }
+                    }
+                Toast.makeText(context, "Plano alimentar deletado com sucesso!", Toast.LENGTH_LONG).show()
+            }
+            catch (e: Exception) {
+                _uiState.value = UserState.Error("Erro ao deletar dados: ${e.message}")
+                Toast.makeText(context, "Erro ao deletar dados: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
 }
