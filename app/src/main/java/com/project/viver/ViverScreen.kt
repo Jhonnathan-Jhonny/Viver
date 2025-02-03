@@ -1,6 +1,7 @@
 package com.project.viver
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -223,6 +224,7 @@ fun ViverAppTopBar2(
                 onClick = {
                     if (currentScreen == ViverScreen.Home) {
                         viewModel.logOutUser(context = context)
+                        Toast.makeText(context, "Deslogado!", Toast.LENGTH_LONG).show()
                         // Após fazer logout, navega para o login
                         navController.navigate(ViverScreen.Login.name) {
                             popUpTo(ViverScreen.Home.name) { inclusive = true }

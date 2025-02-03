@@ -2,7 +2,6 @@
 
 package com.project.viver
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -217,7 +216,7 @@ open class ViverViewModel : ViewModel() {
                             eq("idAuth", userId)
                         }
                     }
-
+                fetchUserProfile(context)
                 _uiState.value = UserState.Success("Perfil atualizado com sucesso.")
             } catch (e: Exception) {
                 _uiState.value = UserState.Error("Erro ao atualizar perfil: ${e.message ?: "Erro desconhecido"}")
@@ -517,11 +516,9 @@ open class ViverViewModel : ViewModel() {
                     )
 
                     _uiState.value = UserState.Success("Plano alimentar salvo com sucesso!")
-                    Toast.makeText(context, "Plano alimentar salvo com sucesso!", Toast.LENGTH_LONG).show()
             } catch (e: Exception) {
                 _uiState.value = UserState.Error("Erro ao salvar o plano alimentar: ${e.message}")
                 Toast.makeText(context, "Erro ao salvar o plano alimentar: ${e.message}", Toast.LENGTH_LONG).show()
-                Log.e("Minha pica:", "Erro ao salvar plano alimentar", e)
             }
         }
     }
@@ -556,7 +553,6 @@ open class ViverViewModel : ViewModel() {
                 _uiState.value = UserState.Success("Planos alimentares carregados com sucesso!")
             } catch (e: Exception) {
                 _uiState.value = UserState.Error("Erro ao buscar planos alimentares: ${e.message}")
-                Log.e("ViverViewModel", "Erro ao buscar planos alimentares", e)
             }
         }
     }

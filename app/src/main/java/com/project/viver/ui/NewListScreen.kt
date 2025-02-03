@@ -2,6 +2,7 @@ package com.project.viver.ui
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -232,6 +233,7 @@ fun NewListScreen(
                         mealPlanName = mealPlanName,
                         context = context,
                     )
+                    Toast.makeText(context, "Plano alimentar salvo com sucesso!", Toast.LENGTH_LONG).show()
                 },
                 nameConfirmButton = "Salvar",
                 isLoading = false

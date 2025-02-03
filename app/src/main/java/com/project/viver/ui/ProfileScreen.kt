@@ -76,7 +76,7 @@ fun ProfileScreen(
     val userState by viewModel.uiState.collectAsState()
 
     // Busca os dados do usuário
-    LaunchedEffect(key1 = true) {
+    LaunchedEffect(Unit) {
         viewModel.fetchUserProfile(context)
     }
     Box(
