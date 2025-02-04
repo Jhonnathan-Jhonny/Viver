@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -91,7 +92,10 @@ fun ProfileScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = Color.White)
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        modifier = Modifier.testTag("loadingIndicator")
+                    )
                 }
             }
             is UserState.Error -> {
@@ -104,7 +108,8 @@ fun ProfileScreen(
                         text = (userState as UserState.Error).message,
                         color = Color.White,
                         style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.testTag("errorMessage")
                     )
                 }
             }
@@ -203,7 +208,9 @@ fun ProfileContent(
                     text = name.value ?: "Carregando...",
                     color = Color.Black,
                     style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.padding(end = 8.dp), // Espaço entre nome e sobrenome
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .testTag("nameField"),
                     textAlign = TextAlign.Center
                 )
                 Text(
@@ -232,7 +239,8 @@ fun ProfileContent(
                     .align(Alignment.CenterHorizontally)
                     .padding(top = 8.dp)
                     .height(40.dp)
-                    .width(150.dp),
+                    .width(150.dp)
+                    .testTag("editProfileButton"),
                 shape = RoundedCornerShape(10.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Transparent,
@@ -258,14 +266,16 @@ fun ProfileContent(
                     value = name.value,
                     isEditable = isEditing,
                     onNext = { focusManager.moveFocus(FocusDirection.Down) },
-                    onValueChange = { name.value = it }
+                    onValueChange = { name.value = it },
+                    modifier = Modifier.testTag(if (isEditing) "nameFieldEditable" else "nameField")
                 )
                 ProfileInfoRow(
                     label = stringResource(id = R.string.sobrenome),
                     value = surname.value,
                     isEditable = isEditing,
                     onNext = { focusManager.moveFocus(FocusDirection.Down) },
-                    onValueChange = { surname.value = it }
+                    onValueChange = { surname.value = it },
+                    modifier = Modifier.testTag("surnameField")
                 )
                 ProfileInfoRow(
                     label = stringResource(id = R.string.e_mail),
@@ -303,7 +313,8 @@ fun ProfileContent(
                         width = 2.dp,
                         color = Color.Red,
                         shape = RoundedCornerShape(12.dp)
-                    ),
+                    )
+                    .testTag("deactivateAccountButton"),
                 shape = RoundedCornerShape(50)
             ) {
                 Text(
@@ -341,7 +352,8 @@ fun ProfileContent(
                                 }
                                 onDeleteActionConfirmedButtonClicked()
                             },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                            modifier = Modifier.testTag("confirmDeleteButton")
                         ) {
                             Text(text = "Sim", color = Color.White)
                         }
@@ -432,12 +444,13 @@ fun ProfileInfoRow(
     value: String,
     isEditable: Boolean = false,
     onNext: (() -> Unit)? = null,
-    onValueChange: (String) -> Unit = {}
+    onValueChange: (String) -> Unit = {},
+    modifier: Modifier = Modifier
 ) {
     var errorMessage by remember { mutableStateOf(false) }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
     ) {
@@ -479,7 +492,7 @@ fun ProfileInfoRow(
             }
         } else {
             Column (
-                modifier = Modifier
+                modifier = modifier
                     .border(
                         width = 1.dp,
                         color = Color.Gray.copy(alpha = 0.3f), // Bordas sutis

@@ -28,17 +28,21 @@ import kotlinx.coroutines.launch
 
 open class ViverViewModel : ViewModel() {
 
-    private val _uiState = MutableStateFlow<UserState>(UserState.Loading)
-    val uiState: StateFlow<UserState> = _uiState
+    val _uiState = MutableStateFlow<UserState>(UserState.Loading)
+    open val uiState: StateFlow<UserState> = _uiState
 
-    private val _userProfile = MutableLiveData<OrderUiStateUser>()
-    val userProfile: LiveData<OrderUiStateUser> = _userProfile
+    val _userProfile = MutableLiveData<OrderUiStateUser>()
+    open val userProfile: LiveData<OrderUiStateUser> = _userProfile
 
     private val _mealPlans = mutableStateListOf<MealPlan>()
     val mealPlans: SnapshotStateList<MealPlan> get() = _mealPlans
 
     private val _mealPlan = MutableLiveData<MealPlan?>()
     val mealPlan: LiveData<MealPlan?> = _mealPlan
+
+    open fun setUiState(newState: UserState) {
+        _uiState.value = newState
+    }
 
     private fun saveToken(context: Context) {
         viewModelScope.launch {
@@ -53,7 +57,7 @@ open class ViverViewModel : ViewModel() {
         return sharedPref.getStringData("accessToken")
     }
 
-    fun fetchUserProfile(context: Context) {
+    open fun fetchUserProfile(context: Context) {
         viewModelScope.launch {
             _uiState.value = UserState.Loading
             try {
@@ -157,7 +161,7 @@ open class ViverViewModel : ViewModel() {
         }
     }
 
-    fun logOutUser(context: Context) {
+    open fun logOutUser(context: Context) {
         viewModelScope.launch {
             try {
                 val sharedPref = SharedPreferenceHelper(context)
@@ -190,7 +194,7 @@ open class ViverViewModel : ViewModel() {
         }
     }
 
-    fun updateUserProfile(user: OrderUiStateUser, context: Context) {
+    open fun updateUserProfile(user: OrderUiStateUser, context: Context) {
         viewModelScope.launch {
             try {
                 _uiState.value = UserState.Loading
@@ -268,7 +272,7 @@ open class ViverViewModel : ViewModel() {
         }
     }
 
-    suspend fun deleteUser(context: Context) {
+    open suspend fun deleteUser(context: Context) {
         supabase.auth.importAuthToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5aW9lZHNqcHdrcnFwaXluYXhjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczNTgyNTU5OSwiZXhwIjoyMDUxNDAxNTk5fQ.zjr5ShFjvXXPx2QpSfjcfXF73oNC_h5Gy400GfQ6_zw")
 
         // Obtendo o token do contexto

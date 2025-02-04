@@ -98,4 +98,7 @@ dependencies {
 
     // Logging (SLF4J)
     implementation("org.slf4j:slf4j-simple:1.7.32")
+
+    androidTestImplementation("io.mockk:mockk-android:1.13.4")
+
 }
