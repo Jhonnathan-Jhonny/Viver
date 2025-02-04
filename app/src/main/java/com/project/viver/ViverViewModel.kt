@@ -31,7 +31,7 @@ open class ViverViewModel : ViewModel() {
     val _uiState = MutableStateFlow<UserState>(UserState.Loading)
     open val uiState: StateFlow<UserState> = _uiState
 
-    val _userProfile = MutableLiveData<OrderUiStateUser>()
+    private val _userProfile = MutableLiveData<OrderUiStateUser>()
     open val userProfile: LiveData<OrderUiStateUser> = _userProfile
 
     private val _mealPlans = mutableStateListOf<MealPlan>()
@@ -345,7 +345,6 @@ open class ViverViewModel : ViewModel() {
     private val totals = mutableStateMapOf<String, Double>()
     private val usedFoods = mutableSetOf<String>()
 
-
     // Alimentos para lanches (manhã e tarde) divididos por categorias
     private val snackProteins = listOf(
         Food(name = "Iogurte natural", calories = 59, protein = 3.5, fat = 3.3, carbs = 4.7),
@@ -470,6 +469,11 @@ open class ViverViewModel : ViewModel() {
         val proteinGrams = weight * 2
         val fatGrams = weight * 0.8
         val carbGrams = (dailyCalories - (proteinGrams * 4 + fatGrams * 9)) / 4
+
+        // Verificar se carbGrams não é negativo
+        if (carbGrams < 0) {
+            throw IllegalArgumentException("A redução calórica é muito grande. Ajuste o valor de calorieReduction.")
+        }
 
         // Divisão em lanches e refeições principais
         val morningSnack = createMeal(proteinGrams / 10, fatGrams / 10, carbGrams / 5, isSnack = true)
