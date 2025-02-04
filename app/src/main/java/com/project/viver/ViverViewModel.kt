@@ -352,9 +352,13 @@ open class ViverViewModel : ViewModel() {
         Food(name = "Ovo cozido", calories = 68, protein = 5.5, fat = 4.8, carbs = 0.6),
         Food(name = "Peito de peru", calories = 104, protein = 18.0, fat = 1.0, carbs = 1.5),
         Food(name = "Atum em água", calories = 128, protein = 26.0, fat = 1.0, carbs = 0.0),
-        Food(name = "Edamame", calories = 122, protein = 11.0, fat = 5.0, carbs = 9.0),
         Food(name = "Leite de amêndoa", calories = 30, protein = 1.0, fat = 2.5, carbs = 1.0),
-        Food(name = "Proteína em pó (whey)", calories = 120, protein = 24.0, fat = 1.0, carbs = 3.0)
+        Food(name = "Proteína em pó (whey)", calories = 120, protein = 24.0, fat = 1.0, carbs = 3.0),
+        Food(name = "Edamame", calories = 122, protein = 11.0, fat = 5.0, carbs = 9.0),
+        Food(name = "Tofu", calories = 76, protein = 8.0, fat = 4.8, carbs = 1.9),
+        Food(name = "Iogurte grego", calories = 100, protein = 10.0, fat = 0.7, carbs = 3.5),
+        Food(name = "Queijo minas frescal", calories = 80, protein = 6.0, fat = 6.0, carbs = 1.0),
+        Food(name = "Presunto magro", calories = 90, protein = 14.0, fat = 3.0, carbs = 1.0)
     )
 
     private val snackCarbs = listOf(
@@ -365,7 +369,11 @@ open class ViverViewModel : ViewModel() {
         Food(name = "Granola", calories = 471, protein = 10.0, fat = 20.0, carbs = 64.0),
         Food(name = "Manga", calories = 60, protein = 0.8, fat = 0.4, carbs = 15.0),
         Food(name = "Uvas", calories = 69, protein = 0.7, fat = 0.2, carbs = 18.0),
-        Food(name = "Torrada integral", calories = 75, protein = 3.0, fat = 1.0, carbs = 12.0)
+        Food(name = "Torrada integral", calories = 75, protein = 3.0, fat = 1.0, carbs = 12.0),
+        Food(name = "Pera", calories = 57, protein = 0.4, fat = 0.1, carbs = 15.0),
+        Food(name = "Kiwi", calories = 61, protein = 1.1, fat = 0.5, carbs = 15.0),
+        Food(name = "Melão", calories = 34, protein = 0.8, fat = 0.2, carbs = 8.0),
+        Food(name = "Biscoito de arroz integral", calories = 35, protein = 0.7, fat = 0.3, carbs = 7.0)
     )
 
     private val snackFats = listOf(
@@ -376,7 +384,11 @@ open class ViverViewModel : ViewModel() {
         Food(name = "Sementes de girassol", calories = 584, protein = 21.0, fat = 51.0, carbs = 20.0),
         Food(name = "Coco ralado", calories = 354, protein = 3.3, fat = 33.5, carbs = 15.0),
         Food(name = "Azeitonas", calories = 115, protein = 0.8, fat = 11.0, carbs = 6.0),
-        Food(name = "Manteiga de amêndoa", calories = 614, protein = 21.0, fat = 56.0, carbs = 19.0)
+        Food(name = "Manteiga de amêndoa", calories = 614, protein = 21.0, fat = 56.0, carbs = 19.0),
+        Food(name = "Sementes de abóbora", calories = 559, protein = 30.0, fat = 49.0, carbs = 11.0),
+        Food(name = "Pistache", calories = 562, protein = 20.0, fat = 45.0, carbs = 28.0),
+        Food(name = "Manteiga de castanha-do-pará", calories = 600, protein = 18.0, fat = 58.0, carbs = 12.0),
+        Food(name = "Tahine", calories = 595, protein = 17.0, fat = 53.0, carbs = 21.0)
     )
 
     // Alimentos para refeições principais (almoço e jantar) divididos por categorias
@@ -384,11 +396,15 @@ open class ViverViewModel : ViewModel() {
         Food(name = "Frango grelhado", calories = 165, protein = 31.0, fat = 3.6, carbs = 0.0),
         Food(name = "Peixe assado", calories = 206, protein = 22.0, fat = 12.0, carbs = 0.0),
         Food(name = "Carne bovina magra", calories = 250, protein = 26.0, fat = 15.0, carbs = 0.0),
-        Food(name = "Tofu", calories = 76, protein = 8.0, fat = 4.8, carbs = 1.9),
         Food(name = "Salmão", calories = 208, protein = 20.0, fat = 13.0, carbs = 0.0),
         Food(name = "Camarão", calories = 99, protein = 24.0, fat = 0.3, carbs = 0.2),
         Food(name = "Lentilhas", calories = 116, protein = 9.0, fat = 0.4, carbs = 20.0),
-        Food(name = "Omelete de claras", calories = 52, protein = 11.0, fat = 0.2, carbs = 0.7)
+        Food(name = "Omelete de claras", calories = 52, protein = 11.0, fat = 0.2, carbs = 0.7),
+        Food(name = "Peito de peru grelhado", calories = 135, protein = 29.0, fat = 1.0, carbs = 0.0),
+        Food(name = "Tilápia grelhada", calories = 129, protein = 26.0, fat = 2.7, carbs = 0.0),
+        Food(name = "Carne de porco magra", calories = 242, protein = 27.0, fat = 14.0, carbs = 0.0),
+        Food(name = "Quinoa cozida", calories = 120, protein = 4.1, fat = 1.9, carbs = 21.3),
+        Food(name = "Tempeh", calories = 193, protein = 19.0, fat = 11.0, carbs = 9.0)
     )
 
     private val mainCarbs = listOf(
@@ -399,18 +415,26 @@ open class ViverViewModel : ViewModel() {
         Food(name = "Massa integral", calories = 131, protein = 5.0, fat = 1.0, carbs = 25.0),
         Food(name = "Cuscuz", calories = 112, protein = 3.8, fat = 0.2, carbs = 23.0),
         Food(name = "Abóbora assada", calories = 49, protein = 1.0, fat = 0.2, carbs = 12.0),
-        Food(name = "Grão-de-bico", calories = 164, protein = 8.9, fat = 2.6, carbs = 27.0)
+        Food(name = "Grão-de-bico", calories = 164, protein = 8.9, fat = 2.6, carbs = 27.0),
+        Food(name = "Batata-baroa", calories = 100, protein = 1.0, fat = 0.2, carbs = 23.0),
+        Food(name = "Inhame", calories = 118, protein = 2.0, fat = 0.2, carbs = 28.0),
+        Food(name = "Milho cozido", calories = 96, protein = 3.4, fat = 1.5, carbs = 21.0),
+        Food(name = "Ervilha", calories = 81, protein = 5.0, fat = 0.4, carbs = 14.0)
     )
 
     private val mainFats = listOf(
         Food(name = "Azeite de oliva", calories = 119, protein = 0.0, fat = 13.5, carbs = 0.0),
         Food(name = "Abacate", calories = 160, protein = 2.0, fat = 15.0, carbs = 9.0),
         Food(name = "Sementes de chia", calories = 486, protein = 16.5, fat = 30.7, carbs = 42.1),
-        Food(name = "Manteiga ghee", calories = 112, protein = 0.0, fat = 12.7, carbs = 0.0),
         Food(name = "Óleo de coco", calories = 121, protein = 0.0, fat = 13.5, carbs = 0.0),
         Food(name = "Azeitonas pretas", calories = 145, protein = 1.0, fat = 15.0, carbs = 4.0),
         Food(name = "Salmão (gordura natural)", calories = 208, protein = 20.0, fat = 13.0, carbs = 0.0),
-        Food(name = "Queijo feta", calories = 264, protein = 14.0, fat = 21.0, carbs = 4.0)
+        Food(name = "Queijo feta", calories = 264, protein = 14.0, fat = 21.0, carbs = 4.0),
+        Food(name = "Manteiga ghee", calories = 112, protein = 0.0, fat = 12.7, carbs = 0.0),
+        Food(name = "Óleo de linhaça", calories = 120, protein = 0.0, fat = 13.6, carbs = 0.0),
+        Food(name = "Sementes de linhaça", calories = 534, protein = 18.0, fat = 42.0, carbs = 29.0),
+        Food(name = "Creme de castanha-do-pará", calories = 600, protein = 18.0, fat = 58.0, carbs = 12.0),
+        Food(name = "Óleo de abacate", calories = 120, protein = 0.0, fat = 13.5, carbs = 0.0)
     )
 
     // Função para criar refeições com alimentos diversificados
