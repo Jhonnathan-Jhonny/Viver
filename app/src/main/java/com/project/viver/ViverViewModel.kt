@@ -247,7 +247,7 @@ open class ViverViewModel : ViewModel() {
 
     suspend fun updatePassword(context: Context, newPassword: String) {
         // Importando o token da chave de serviço
-        supabase.auth.importAuthToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5aW9lZHNqcHdrcnFwaXluYXhjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczNTgyNTU5OSwiZXhwIjoyMDUxNDAxNTk5fQ.zjr5ShFjvXXPx2QpSfjcfXF73oNC_h5Gy400GfQ6_zw")
+        supabase.auth.importAuthToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95emhuYXl6aWRnb3pjZm12cnZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE3NDgxMDgsImV4cCI6MjA3NzMyNDEwOH0.gshBgv60jT2QNwOtxHYrwB_XnO52QiSjl_imi1YUQ9Y")
 
         // Recuperando o token da sessão
         val token = getToken(context)
@@ -273,7 +273,7 @@ open class ViverViewModel : ViewModel() {
     }
 
     open suspend fun deleteUser(context: Context) {
-        supabase.auth.importAuthToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5aW9lZHNqcHdrcnFwaXluYXhjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczNTgyNTU5OSwiZXhwIjoyMDUxNDAxNTk5fQ.zjr5ShFjvXXPx2QpSfjcfXF73oNC_h5Gy400GfQ6_zw")
+        supabase.auth.importAuthToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95emhuYXl6aWRnb3pjZm12cnZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE3NDgxMDgsImV4cCI6MjA3NzMyNDEwOH0.gshBgv60jT2QNwOtxHYrwB_XnO52QiSjl_imi1YUQ9Y")
 
         // Obtendo o token do contexto
         val token = getToken(context)
