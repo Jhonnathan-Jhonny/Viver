@@ -98,4 +98,7 @@ dependencies {
 
     // Logging (SLF4J)
     implementation("org.slf4j:slf4j-simple:1.7.32")
+
+    //Diferentes telas
+    implementation("androidx.compose.material3:material3-window-size-class")
 }
