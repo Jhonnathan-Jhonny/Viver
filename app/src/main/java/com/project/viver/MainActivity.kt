@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
                 ){
                     val windowSize = calculateWindowSizeClass(this)
                     ViverApp(
-                        windowsize = windowSize.widthSizeClass
+                        windowSize = windowSize.widthSizeClass
                     )
                 }
             }

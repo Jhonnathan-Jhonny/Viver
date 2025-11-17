@@ -34,6 +34,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -205,7 +206,8 @@ fun LoginScreen(
     )
 }
 
-@Preview(showBackground = true)
+//@Preview(name = "Celular", device = Devices.PIXEL_4, showBackground = true)
+@Preview(name = "Tablet", device = Devices.PIXEL_C, showBackground = true)
 @Composable
 fun PreviewWelcomeScreen() {
     val navController = NavController(LocalContext.current)
