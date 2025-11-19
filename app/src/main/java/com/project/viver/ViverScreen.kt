@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -244,7 +245,7 @@ fun ViverAppTopBar2(
                 brush = Brush.verticalGradient(
                     0f to Color(0xFFA8D5BA),
                     1f to Color(0xFF68B684),
-                )
+                ),
             ),
         title = {
             Row(
@@ -331,6 +332,7 @@ fun ViverNavHost(
 ) {
     Scaffold(
         topBar = topBar,
+        contentWindowInsets = WindowInsets(0,0,0,100)
     ) { innerPadding ->
         NavHost(
             navController = navController,
