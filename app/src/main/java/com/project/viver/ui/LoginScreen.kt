@@ -88,6 +88,11 @@ fun LoginScreen(
     }
 
     Scaffold(
+        topBar = if(true){
+            {}
+        }else{
+            {}
+        },
         content = {
             Column(
                 modifier = Modifier
