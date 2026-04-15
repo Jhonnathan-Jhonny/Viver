@@ -8,8 +8,9 @@ import kotlinx.serialization.json.Json
 
 object SupabaseClient {
     val supabase = createSupabaseClient(
-        supabaseUrl = "https://oyzhnayzidgozcfmvrvb.supabase.co",
-        supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95emhuYXl6aWRnb3pjZm12cnZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE3NDgxMDgsImV4cCI6MjA3NzMyNDEwOH0.gshBgv60jT2QNwOtxHYrwB_XnO52QiSjl_imi1YUQ9Y"
+//        Request failed with Unable to resolve host "oyzhnayzidgozcfmvrvb.supabase.co": No address associated with hostname
+        supabaseUrl = "https://kaenpcrufhqbozxkrsrq.supabase.co",
+        supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImthZW5wY3J1ZmhxYm96eGtyc3JxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNTkyNDQsImV4cCI6MjA5MTgzNTI0NH0.jGIEscgFnuCKQS_tNEJPpmwyDP0vOmd-2Ql8XgiIp0Q"
     ) {
         install(Auth)
         install(Postgrest) {
