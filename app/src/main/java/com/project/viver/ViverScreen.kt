@@ -48,6 +48,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.project.viver.ui.ConfirmEmailScreen
 import com.project.viver.ui.ConfirmPasswordScreen
 import com.project.viver.ui.EditedPasswordSuccessfullyScreen
 import com.project.viver.ui.ForgotPasswordScreen
@@ -66,6 +67,7 @@ import com.project.viver.utils.ViverNavigationType
 
 enum class ViverScreen {
     ConfirmPassword,
+    ConfirmEmail,
     EditedPasswordSuccessfully,
     EmailSent,
     SpecificList,
@@ -365,13 +367,18 @@ fun ViverNavHost(
             composable(route = ViverScreen.SignUp.name) {
                 SignUpScreen(
                     onSignUpButtonClicked = {
-                        navController.navigate(ViverScreen.Login.name) {
+                        navController.navigate(ViverScreen.ConfirmEmail.name) {
                             popUpTo(ViverScreen.SignUp.name) { inclusive = true }
                         }
                     },
                     viewModel = viewModel,
                     context = context,
                     onBackLoginButtonClicked = { navController.navigate(ViverScreen.Login.name) }
+                )
+            }
+            composable(route = ViverScreen.ConfirmEmail.name){
+                ConfirmEmailScreen(
+                    onOkButtonClicked = { navController.navigate(ViverScreen.Login.name) }
                 )
             }
             composable(route = ViverScreen.ForgotPassword.name) {
@@ -502,7 +509,8 @@ fun ViverApp(
         ViverScreen.ValidateEmail,
         ViverScreen.EditedPasswordSuccessfully,
         ViverScreen.ConfirmPassword,
-        ViverScreen.NewPassword
+        ViverScreen.NewPassword,
+        ViverScreen.ConfirmEmail
     )
 
     val topBar2Screens = listOf(
@@ -576,7 +584,8 @@ fun ViverApp(
                 ViverScreen.ValidateEmail,
                 ViverScreen.EditedPasswordSuccessfully,
                 ViverScreen.ConfirmPassword,
-                ViverScreen.NewPassword -> {
+                ViverScreen.NewPassword,
+                ViverScreen.ConfirmEmail-> {
                     ViverAppTopBar1(
                         navigationType = navigationType,
                         currentScreen = currentScreen,
