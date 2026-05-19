@@ -40,12 +40,13 @@ fun ConfirmEmailScreen(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .background(Color.White),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(Color.White)
+            .padding(horizontal = 30.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Spacer(modifier = Modifier.height(370.dp))
 
         Image(
             painter = painterResource(id = R.drawable.email_confirm),
@@ -70,8 +71,7 @@ fun ConfirmEmailScreen(
             text = "Confirme seu e-mail verificando sua caixa de entrada ou spam.",
             color = colorResource(id = R.color.on_secondary_container_dark),
             textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth(0.7f)
+            modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -83,8 +83,6 @@ fun ConfirmEmailScreen(
             colorButton = colorResource(id = R.color.First),
             colorText = Color.White
         )
-
-        Spacer(modifier = Modifier.weight(1f))
     }
 }
 
