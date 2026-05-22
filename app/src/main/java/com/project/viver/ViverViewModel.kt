@@ -272,6 +272,10 @@ open class ViverViewModel : ViewModel() {
         }
     }
 
+    suspend fun ForgotPassword(email: String){
+        supabase.auth.resetPasswordForEmail(email)
+    }
+
     open suspend fun deleteUser(context: Context) {
         supabase.auth.importAuthToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95emhuYXl6aWRnb3pjZm12cnZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE3NDgxMDgsImV4cCI6MjA3NzMyNDEwOH0.gshBgv60jT2QNwOtxHYrwB_XnO52QiSjl_imi1YUQ9Y")
 
