@@ -17,6 +17,7 @@ import com.project.viver.data.models.UserState
 import com.project.viver.data.network.SupabaseClient.supabase
 import com.project.viver.utils.SharedPreferenceHelper
 import io.github.jan.supabase.exceptions.RestException
+import io.github.jan.supabase.functions.functions
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.postgrest.from
@@ -273,7 +274,12 @@ open class ViverViewModel : ViewModel() {
     }
 
     suspend fun ForgotPassword(email: String){
-        supabase.auth.resetPasswordForEmail(email)
+        supabase.functions.invoke(
+            function = "forgot-password",
+            body = mapOf(
+                "email" to email
+            )
+        )
     }
 
     open suspend fun deleteUser(context: Context) {

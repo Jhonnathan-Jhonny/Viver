@@ -1,6 +1,7 @@
 package com.project.viver.data.network
 
 import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.functions.Functions
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.serializer.KotlinXSerializer
@@ -13,6 +14,7 @@ object SupabaseClient {
         supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImthZW5wY3J1ZmhxYm96eGtyc3JxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNTkyNDQsImV4cCI6MjA5MTgzNTI0NH0.jGIEscgFnuCKQS_tNEJPpmwyDP0vOmd-2Ql8XgiIp0Q"
     ) {
         install(Auth)
+        install(Functions)
         install(Postgrest) {
             serializer = KotlinXSerializer(
                 Json {
