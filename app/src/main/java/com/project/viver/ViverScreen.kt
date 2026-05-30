@@ -384,7 +384,6 @@ fun ViverNavHost(
             composable(route = ViverScreen.ForgotPassword.name) {
                 ForgotPasswordScreen(
                     onOkButtonClicked = { navController.navigate(ViverScreen.Login.name) },
-                    emailContact = "jhonnathan.rodrigues@aluno.uepb.edu.br"
                 )
             }
             composable(route = ViverScreen.Home.name) {

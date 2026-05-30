@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -27,12 +26,12 @@ import androidx.navigation.NavController
 import com.project.viver.R
 import com.project.viver.ViverScreen
 import com.project.viver.data.models.SingleButton
+import com.project.viver.data.models.TextBox
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ForgotPasswordScreen(
-    emailContact: String,
-    onOkButtonClicked: () -> Unit
+    onSendButtonClicked: () -> Unit
 ) {
     Scaffold(
         content = {
@@ -54,7 +53,7 @@ fun ForgotPasswordScreen(
                         verticalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = "Redefinir senha",
+                            text = "Esqueceu a senha?",
                             color = colorResource(id = R.color.First),
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp
@@ -63,27 +62,26 @@ fun ForgotPasswordScreen(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         Text(
-                            text = "Entre em contato com",
+                            text = "Enviaremos um e-mail com a nova senha de acesso. \n Após login recomendamos alterar sua senha!",
                             color = Color.Gray,
                             fontSize = 14.sp
                         )
 
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Text(
-                            text = emailContact,
-                            color = Color.Black,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 14.sp,
-                            modifier = Modifier.padding(vertical = 50.dp)
-                        )
-
                         Spacer(modifier = Modifier.height(24.dp))
 
+                        // Configurar essa função e gerenciar telas
+                        TextBox(
+                            value = "",
+                            label = "Email",
+                            onValueChange = {}
+                        )
+
+                        Spacer(modifier = Modifier.height(48.dp))
+
                         SingleButton(
-                            onClick = onOkButtonClicked,
+                            onClick = onSendButtonClicked,
                             isLoading = false,
-                            buttonName = "OK",
+                            buttonName = "Enviar",
                             colorButton = colorResource(id = R.color.First),
                             colorText = Color.White
                         )
@@ -100,8 +98,7 @@ fun ForgotPasswordScreen(
 fun PreviewForgotPasswordScreen() {
     val navController = NavController(LocalContext.current)
     ForgotPasswordScreen(
-        emailContact = "william.henry.moody@my-own-personal-domain.com",
-        onOkButtonClicked = {navController.navigate(ViverScreen.Login.name)}
+        onSendButtonClicked = {navController.navigate(ViverScreen.Login.name)}
     )
 }
 

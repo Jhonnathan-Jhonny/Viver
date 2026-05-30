@@ -274,12 +274,17 @@ open class ViverViewModel : ViewModel() {
     }
 
     suspend fun ForgotPassword(email: String){
-        supabase.functions.invoke(
-            function = "forgot-password",
-            body = mapOf(
-                "email" to email
+        try {
+            supabase.functions.invoke(
+                function = "forgot-password",
+                body = mapOf(
+                    "email" to email
+                )
             )
-        )
+            _uiState.value = UserState.Success("Senha Alterada com sucesso: Consulte seu email!")
+        } catch (e: Exception){
+            _uiState.value = UserState.Error("Usuário não encontrado!")
+        }
     }
 
     open suspend fun deleteUser(context: Context) {
