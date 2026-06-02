@@ -68,7 +68,7 @@ fun ConfirmEmailScreen(
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = "Confirme seu e-mail verificando sua caixa de entrada ou spam.",
+            text = "Verifique seu e-mail verificando sua caixa de entrada ou spam.",
             color = colorResource(id = R.color.on_secondary_container_dark),
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()

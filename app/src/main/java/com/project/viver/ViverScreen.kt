@@ -383,7 +383,7 @@ fun ViverNavHost(
             }
             composable(route = ViverScreen.ForgotPassword.name) {
                 ForgotPasswordScreen(
-                    onSendButtonClicked = { navController.navigate(ViverScreen.Login.name) },
+                    onSendButtonClicked = { navController.navigate(ViverScreen.ConfirmEmail.name) },
                     viewModel = viewModel,
                     context = context
                 )
