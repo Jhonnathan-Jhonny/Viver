@@ -139,14 +139,14 @@ fun ForgotPasswordScreen(
                                         if (result is UserState.Success) {
                                             Toast.makeText(
                                                 context,
-                                                "Logado com sucesso",
+                                                "Email enviado com sucesso.",
                                                 Toast.LENGTH_LONG
                                             ).show()
                                             onSendButtonClicked()
                                         } else if (result is UserState.Error) {
                                             Toast.makeText(
                                                 context,
-                                                "Usuário inexistente ou email ou senha incorreta",
+                                                "Usuário inexistente ou email incorreto.",
                                                 Toast.LENGTH_LONG
                                             ).show()
                                         }
