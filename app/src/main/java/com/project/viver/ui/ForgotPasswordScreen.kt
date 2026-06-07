@@ -134,7 +134,7 @@ fun ForgotPasswordScreen(
                                 scope.launch {
                                     if (validateFields()) {
                                         isLoading = true
-                                        val result = viewModel.ForgotPassword(confirmEmail.value)
+                                        val result = viewModel.forgotPassword(confirmEmail.value)
                                         isLoading = false
                                         if (result is UserState.Success) {
                                             Toast.makeText(
@@ -143,10 +143,10 @@ fun ForgotPasswordScreen(
                                                 Toast.LENGTH_LONG
                                             ).show()
                                             onSendButtonClicked()
-                                        } else if (result is UserState.Error) {
+                                        }else if (result is UserState.Error) {
                                             Toast.makeText(
                                                 context,
-                                                "Usuário inexistente ou email incorreto.",
+                                                result.message,
                                                 Toast.LENGTH_LONG
                                             ).show()
                                         }

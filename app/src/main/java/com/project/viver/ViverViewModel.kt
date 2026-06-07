@@ -17,7 +17,6 @@ import com.project.viver.data.models.UserState
 import com.project.viver.data.network.SupabaseClient.supabase
 import com.project.viver.utils.SharedPreferenceHelper
 import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.functions.functions
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.postgrest.from
@@ -273,17 +272,15 @@ open class ViverViewModel : ViewModel() {
         }
     }
 
-    suspend fun ForgotPassword(email: String){
-        try {
-            supabase.functions.invoke(
-                function = "forgot-password",
-                body = mapOf(
-                    "email" to email
-                )
+    suspend fun forgotPassword(email: String): UserState {
+        return try {
+            supabase.auth.resetPasswordForEmail(email)
+            UserState.Success("Email enviado com sucesso!")
+        } catch (e: Exception) {
+            println("ERRO RECUPERAÇÃO SENHA: ${e.message}")
+            UserState.Error(
+                e.message ?: "Erro ao enviar email"
             )
-            _uiState.value = UserState.Success("Senha Alterada com sucesso: Consulte seu email!")
-        } catch (e: Exception){
-            _uiState.value = UserState.Error("Usuário não encontrado!")
         }
     }
 
